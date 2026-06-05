@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Caixinha 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#00C853;--ge:#009c3f;--am:#FFD600;--vm:#FF3D00;--bg:#0a0e1a;--bg2:#0f1422;--card:#141927;--card2:#1a2135;--bo:#1e2a40;--tx:#e8edf5;--sub:#7a8aaa;--ac:#3b82f6;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{font-size:14px;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
+
+/* HEADER */
+.hdr{background:#0f1422;border-bottom:1px solid var(--bo);padding:0 14px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:50px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:7px;}
+.logo-ic{width:30px;height:30px;background:linear-gradient(135deg,var(--g),var(--ac));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.logo em{color:var(--g);font-style:normal;}
+.hdr-r{display:flex;align-items:center;gap:6px;}
+.sel-mes{background:var(--card2);border:1px solid var(--bo);color:var(--tx);padding:4px 6px;border-radius:7px;font-size:.73rem;outline:none;font-family:inherit;}
+.notif-btn{background:var(--card2);border:1px solid var(--bo);color:var(--sub);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;flex-shrink:0;}
+.notif-btn.on{color:var(--am);border-color:rgba(255,214,0,.3);}
+
+/* NAV BOTTOM */
+.nav-bot{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#0f1422;border-top:1px solid var(--bo);display:flex;height:56px;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:none;background:transparent;color:var(--sub);font-size:.55rem;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;padding:3px 2px;}
+.nb .ni{font-size:1.1rem;line-height:1.15;}
+.nb.active{color:var(--g);}
+
+/* MAIN */
+.main{padding:12px 12px 68px;max-width:480px;margin:0 auto;}
+.sec{display:none;animation:fadeIn .2s ease;}
+.sec.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.kpi{background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:12px 11px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:-8px;right:-8px;width:50px;height:50px;border-radius:50%;opacity:.07;}
+.kpi.vd::before{background:var(--g)}.kpi.az::before{background:var(--ac)}.kpi.am::before{background:var(--am)}.kpi.vm::before{background:var(--vm)}
+.kpi-lb{font-size:.6rem;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.kpi-vl{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;word-break:break-all;}
+.kpi.vd .kpi-vl{color:var(--g)}.kpi.az .kpi-vl{color:var(--ac)}.kpi.am .kpi-vl{color:var(--am)}.kpi.vm .kpi-vl{color:var(--vm)}
+.kpi-sb{font-size:.62rem;color:var(--sub);margin-top:2px;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--bo);border-radius:13px;overflow:hidden;margin-bottom:12px;}
+.ch{padding:10px 13px;border-bottom:1px solid var(--bo);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.ct{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;}
+
+/* BTNS */
+.btn{border:none;border-radius:9px;padding:7px 12px;cursor:pointer;font-size:.75rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:.13s;font-family:inherit;white-space:nowrap;}
+.bv{background:linear-gradient(135deg,var(--g),var(--ge));color:#fff;}
+.bv:active{opacity:.85;}
+.bw{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;}
+.bw:active{opacity:.85;}
+.bo2{background:transparent;border:1px solid var(--bo);color:var(--tx);}
+.bo2:active{background:var(--card2);}
+.bd{background:rgba(255,61,0,.13);color:var(--vm);border:1px solid rgba(255,61,0,.22);}
+.bsm{padding:5px 9px;font-size:.71rem;}
+
+/* PARTICIPANTE CARD */
+.part-item{background:var(--card2);border:1px solid var(--bo);border-radius:11px;padding:11px 13px;margin-bottom:9px;transition:.15s;}
+.part-item.pago-ok{border-color:rgba(0,200,83,.25);}
+
+/* STATUS */
+.st{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:14px;font-size:.67rem;font-weight:600;}
+.sv{background:rgba(0,200,83,.12);color:var(--g);border:1px solid rgba(0,200,83,.18);}
+.sa{background:rgba(255,214,0,.12);color:var(--am);border:1px solid rgba(255,214,0,.18);}
+.sr{background:rgba(255,61,0,.12);color:var(--vm);border:1px solid rgba(255,61,0,.18);}
+
+/* CHECKBOX */
+.ck{width:20px;height:20px;border-radius:6px;border:2px solid var(--bo);background:var(--bg2);cursor:pointer;appearance:none;-webkit-appearance:none;transition:.18s;position:relative;flex-shrink:0;}
+.ck:checked{background:var(--g);border-color:var(--g);}
+.ck:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-53%);color:#fff;font-size:.72rem;font-weight:800;}
+
+/* EMPRÉSTIMO CARD */
+.emp-card{background:var(--card2);border:1px solid var(--bo);border-radius:13px;padding:13px;margin-bottom:11px;}
+.emp-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:9px;}
+.er2{display:flex;justify-content:space-between;align-items:center;font-size:.79rem;padding:4px 0;border-bottom:1px solid rgba(30,42,64,.55);}
+.er2:last-of-type{border-bottom:none;}
+.el{color:var(--sub);}
+.erv{font-weight:600;}
+
+/* ALERTAS */
+.alerta-v{background:rgba(255,214,0,.07);border:1px solid rgba(255,214,0,.22);border-radius:9px;padding:8px 11px;margin-bottom:7px;font-size:.76rem;display:flex;align-items:flex-start;gap:7px;}
+.alerta-a{background:rgba(255,61,0,.07);border:1px solid rgba(255,61,0,.22);border-radius:9px;padding:8px 11px;margin-bottom:7px;font-size:.76rem;display:flex;align-items:flex-start;gap:7px;}
+.alerta-g{background:rgba(0,200,83,.07);border:1px solid rgba(0,200,83,.18);border-radius:9px;padding:8px 11px;margin-bottom:7px;font-size:.76rem;display:flex;align-items:flex-start;gap:7px;}
+
+/* MODAL — folha de baixo */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;}
+.ov.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--bo);border-top-left-radius:20px;border-top-right-radius:20px;padding:16px 16px 30px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.modal-drag{width:36px;height:4px;background:var(--bo);border-radius:2px;margin:0 auto 14px;}
+.mt{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;}
+.xb{background:var(--card2);border:1px solid var(--bo);color:var(--sub);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* FORM */
+.fg{margin-bottom:10px;}
+.fl{display:block;font-size:.69rem;font-weight:600;color:var(--sub);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;}
+.fc{width:100%;background:var(--bg2);border:1px solid var(--bo);border-radius:8px;padding:8px 10px;color:var(--tx);font-size:.86rem;outline:none;transition:.17s;font-family:inherit;}
+.fc:focus{border-color:var(--ac);}
+select.fc option{background:var(--bg2);}
+
+/* CALC BOX */
+.cbox{background:var(--bg2);border:1px solid var(--bo);border-radius:9px;padding:10px;margin:7px 0;}
+.cr{display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:4px;}
+.cr.tot{font-size:.87rem;font-weight:700;padding-top:6px;border-top:1px solid var(--bo);margin-bottom:0;}
+
+/* WAPP */
+.wprv{background:linear-gradient(135deg,#0c2316,#091d0e);border:1px solid rgba(37,211,102,.18);border-radius:11px;padding:12px;font-size:.79rem;line-height:1.75;white-space:pre-line;color:#d4edda;font-family:'Courier New',monospace;margin:9px 0;max-height:190px;overflow-y:auto;}
+.wopts{display:flex;flex-direction:column;gap:6px;margin-top:9px;}
+.wbtn{padding:12px;border-radius:10px;border:1px solid var(--bo);background:var(--card2);cursor:pointer;font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--tx);font-family:inherit;}
+.wbtn.main{background:linear-gradient(135deg,#25D366,#128C7E);border:none;color:#fff;}
+.wbtn:active{opacity:.82;}
+
+/* PROGRESSO */
+.prog{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:5px;}
+.prog-b{height:100%;background:linear-gradient(90deg,var(--g),var(--ac));border-radius:3px;transition:width .5s;}
+
+/* RELATÓRIO */
+.rprv{background:var(--bg2);border:1px solid var(--bo);border-radius:11px;padding:13px;font-family:'Courier New',monospace;font-size:.77rem;line-height:1.9;white-space:pre-line;max-height:320px;overflow-y:auto;}
+.rbtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;}
+.rbtn{padding:11px;border-radius:9px;border:1px solid var(--bo);background:var(--card2);cursor:pointer;font-size:.77rem;font-weight:600;color:var(--tx);font-family:inherit;}
+.rbtn:active{background:var(--card);}
+
+/* HISTÓRICO */
+.hg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:9px 0;}
+.hm{text-align:center;border-radius:7px;padding:6px 2px;font-size:.64rem;background:var(--bg2);border:1px solid var(--bo);}
+.hm.ok{background:rgba(0,200,83,.1);border-color:rgba(0,200,83,.2);color:var(--g);}
+.hm.nd{background:rgba(255,61,0,.09);border-color:rgba(255,61,0,.18);color:var(--vm);}
+.hm b{display:block;font-size:.59rem;margin-bottom:2px;}
+
+/* PAGAMENTO LOG */
+.plog{font-size:.7rem;padding:4px 8px;background:rgba(0,200,83,.05);border:1px solid rgba(0,200,83,.1);border-radius:6px;margin-bottom:3px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;color:var(--sub);}
+
+/* LOTE */
+.lote{background:rgba(255,61,0,.06);border:1px solid rgba(255,61,0,.18);border-radius:10px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:11px;}
+
+/* INFO BOX */
+.ibox{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;padding:7px 10px;font-size:.73rem;color:var(--ac);margin-bottom:9px;}
+
+/* CONFIRM */
+.cnf-box{background:var(--card);border:1px solid var(--bo);border-radius:16px;padding:20px 16px;width:calc(100% - 24px);max-width:360px;text-align:center;margin:auto;}
+.cnf-box p{font-size:.82rem;color:var(--sub);margin:5px 0 14px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--g);color:var(--g);padding:9px 16px;border-radius:9px;font-size:.77rem;font-weight:600;z-index:999;display:none;animation:sli .22s ease;white-space:nowrap;max-width:88vw;text-align:center;}
+@keyframes sli{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* BADGE CONTADOR */
+.badge{background:var(--vm);color:#fff;font-size:.6rem;font-weight:700;padding:1px 5px;border-radius:10px;position:absolute;top:4px;right:4px;}
+
+/* DASHBOARD GERENCIAL */
+.dash-kpi-big{background:var(--card);border:1px solid var(--bo);border-radius:14px;padding:16px 14px;margin-bottom:10px;display:flex;align-items:center;gap:13px;}
+.dash-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.dash-icon.vd{background:rgba(0,200,83,.15);}
+.dash-icon.az{background:rgba(59,130,246,.15);}
+.dash-icon.am{background:rgba(255,214,0,.15);}
+.dash-icon.vm{background:rgba(255,61,0,.15);}
+.dash-icon.ro{background:rgba(168,85,247,.15);}
+.dash-lb{font-size:.68rem;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.dash-vl{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
+.dash-vl.vd{color:var(--g)}.dash-vl.az{color:var(--ac)}.dash-vl.am{color:var(--am)}.dash-vl.vm{color:var(--vm)}.dash-vl.ro{color:#a855f7;}
+.dash-sb{font-size:.68rem;color:var(--sub);margin-top:2px;}
+.dash-trend{margin-left:auto;text-align:right;flex-shrink:0;}
+.dash-trend .pct{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:10px;}
+.pct-up{background:rgba(0,200,83,.12);color:var(--g);}
+.pct-dn{background:rgba(255,61,0,.12);color:var(--vm);}
+.pct-ne{background:rgba(122,138,170,.12);color:var(--sub);}
+
+/* GRÁFICO BARRAS CSS */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:80px;padding:0 2px;margin:10px 0 4px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .5s;}
+.bar.pago{background:linear-gradient(180deg,var(--g),var(--ge));}
+.bar.pend{background:var(--bo);}
+.bar-lbl{font-size:.56rem;color:var(--sub);font-weight:600;}
+
+/* TABELA RANKING */
+.rank-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(30,42,64,.5);}
+.rank-row:last-child{border-bottom:none;}
+.rank-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;}
+.rank-1{background:linear-gradient(135deg,#FFD700,#FFA000);color:#000;}
+.rank-2{background:linear-gradient(135deg,#C0C0C0,#9E9E9E);color:#000;}
+.rank-3{background:linear-gradient(135deg,#CD7F32,#8D4E16);color:#fff;}
+.rank-n{background:var(--card2);color:var(--sub);}
+.rank-bar-wrap{flex:1;background:var(--bg2);border-radius:3px;height:5px;overflow:hidden;}
+.rank-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ac),var(--g));}
+
+/* MINI STAT */
+.mini-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.mini-s{background:var(--card);border:1px solid var(--bo);border-radius:11px;padding:10px 8px;text-align:center;}
+.mini-s .mv{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:2px;}
+.mini-s .ml{font-size:.6rem;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+
+/* SECÇÃO TITLE */
+.stit{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--bo);margin:10px 0;}
+
+/* INPUT MONEY */
+.money-wrap{position:relative;}
+.money-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.86rem;color:var(--sub);pointer-events:none;}
+.money-input{padding-left:36px !important;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo"><div class="logo-ic">💰</div>Caixinha <em>2026</em></div>
+  <div class="hdr-r">
+    <button class="notif-btn" id="btnNotif" onclick="toggleNotif()" title="Ativar alertas automáticos">🔔</button>
+    <select id="sel-mes" class="sel-mes" onchange="trocarMes()">
+      <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
+      <option value="3">Abr</option><option value="4">Mai</option><option value="5" selected>Jun</option>
+      <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
+      <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
+    </select>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ═══ PAINEL ═══ -->
+<section id="s-painel" class="sec active">
+  <div class="kpi-grid">
+    <div class="kpi vd"><div class="kpi-lb">Saldo</div><div class="kpi-vl" id="kSaldo">—</div><div class="kpi-sb">Disponível</div></div>
+    <div class="kpi az"><div class="kpi-lb">Arrecadado</div><div class="kpi-vl" id="kCotas">—</div><div class="kpi-sb" id="kCotasSb">0 pagaram</div></div>
+    <div class="kpi am"><div class="kpi-lb">Emprestado</div><div class="kpi-vl" id="kEmp">—</div><div class="kpi-sb" id="kEmpSb">0 ativos</div></div>
+    <div class="kpi vm"><div class="kpi-lb">Juros</div><div class="kpi-vl" id="kJuros">—</div><div class="kpi-sb">a receber</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct" id="pTit">📈 Junho/2026</span><span id="pPct" style="font-size:.75rem;font-weight:700;color:var(--g);">0%</span></div>
+    <div style="padding:8px 13px 13px;">
+      <div style="font-size:.7rem;color:var(--sub);margin-bottom:4px;" id="pLbl">0/10 pagaram</div>
+      <div class="prog"><div class="prog-b" id="pBar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">
+      <span class="ct">🔔 Alertas</span>
+      <button class="btn bd bsm" onclick="cobrarTodos()">⚡ Cobrar todos</button>
+    </div>
+    <div id="alertas" style="padding:8px 11px 6px;"></div>
+  </div>
+</section>
+
+<!-- ═══ DASHBOARD ═══ -->
+<section id="s-dash" class="sec">
+  <div class="stit">
+    <span>📊 Dashboard Gerencial</span>
+    <span style="font-size:.7rem;color:var(--sub);font-weight:400;" id="dash-data"></span>
+  </div>
+
+  <!-- KPIs GRANDES -->
+  <div class="dash-kpi-big">
+    <div class="dash-icon vd">💰</div>
+    <div style="flex:1;">
+      <div class="dash-lb">Saldo Atual</div>
+      <div class="dash-vl vd" id="dSaldo">—</div>
+      <div class="dash-sb">Arrecadado menos emprestado</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;">
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">Arrecadação do Mês</div>
+      <div class="dash-vl az" id="dArrMes" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb" id="dArrMesSb">0 pagaram</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">Arrecadação Total 2026</div>
+      <div class="dash-vl vd" id="dArrTotal" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb" id="dArrTotalSb">ano completo</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;">
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">Total Emprestado</div>
+      <div class="dash-vl am" id="dEmp" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb" id="dEmpSb">em aberto</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">A Receber (saldo+juros)</div>
+      <div class="dash-vl ro" id="dReceber" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb">emprestado + juros</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;">
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">Juros a Receber</div>
+      <div class="dash-vl vm" id="dJuros" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb">20% s/ saldo devedor</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:13px 12px;">
+      <div class="dash-lb">Total Previsto</div>
+      <div class="dash-vl vd" id="dPrevisto" style="font-size:1.05rem;">—</div>
+      <div class="dash-sb">saldo + juros + cotas pend.</div>
+    </div>
+  </div>
+
+  <!-- MINI STATS -->
+  <div class="mini-stats">
+    <div class="mini-s"><div class="mv" id="dNPag" style="color:var(--g);">0</div><div class="ml">Pagaram</div></div>
+    <div class="mini-s"><div class="mv" id="dNPend" style="color:var(--vm);">0</div><div class="ml">Pendentes</div></div>
+    <div class="mini-s"><div class="mv" id="dNEmp" style="color:var(--am);">0</div><div class="ml">Empréstimos</div></div>
+  </div>
+
+  <!-- GRÁFICO ARRECADAÇÃO ANUAL -->
+  <div class="card">
+    <div class="ch"><span class="ct">📈 Arrecadação Mensal 2026</span></div>
+    <div style="padding:12px 10px 8px;">
+      <div class="bar-chart" id="dashBarChart"></div>
+      <div style="display:flex;gap:10px;font-size:.65rem;color:var(--sub);justify-content:center;margin-top:4px;">
+        <span><span style="display:inline-block;width:8px;height:8px;background:var(--g);border-radius:2px;margin-right:3px;"></span>Pago</span>
+        <span><span style="display:inline-block;width:8px;height:8px;background:var(--bo);border-radius:2px;margin-right:3px;"></span>Previsto</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANKING PARTICIPANTES -->
+  <div class="card">
+    <div class="ch"><span class="ct">🏆 Ranking — Total Investido</span></div>
+    <div style="padding:10px 13px;" id="dashRanking"></div>
+  </div>
+
+  <!-- INADIMPLÊNCIA -->
+  <div class="card">
+    <div class="ch">
+      <span class="ct">⚠️ Pendentes — <span id="dashMesLabel">Jun</span></span>
+      <button class="btn bd bsm" onclick="cobrarTodos()">⚡ Cobrar todos</button>
+    </div>
+    <div style="padding:10px 13px;" id="dashPendentes"></div>
+  </div>
+
+  <!-- EMPRÉSTIMOS ATIVOS -->
+  <div class="card" id="dashEmpCard">
+    <div class="ch"><span class="ct">💳 Empréstimos Ativos</span></div>
+    <div style="padding:10px 13px;" id="dashEmps"></div>
+  </div>
+</section>
+
+<!-- ═══ PARTICIPANTES ═══ -->
+<section id="s-part" class="sec">
+  <div class="stit">
+    <span>👥 Participantes</span>
+    <input style="background:var(--card2);border:1px solid var(--bo);border-radius:8px;padding:5px 9px;color:var(--tx);font-size:.74rem;outline:none;width:118px;font-family:inherit;" type="text" placeholder="🔍 Buscar..." id="busca" oninput="renderPart()">
+  </div>
+  <div id="lote" style="display:none" class="lote">
+    <span style="font-size:.79rem;">⚠️ <strong id="nAtras" style="color:var(--vm);">0</strong> pendente(s)</span>
+    <button class="btn bd bsm" onclick="cobrarTodos()">📲 Cobrar todos</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+    <button class="btn bv bsm" onclick="todosOk()">✅ Todos pagos</button>
+    <button class="btn bo2 bsm" onclick="limparMes()">↩ Limpar mês</button>
+  </div>
+  <div id="lista-part"></div>
+</section>
+
+<!-- ═══ EMPRÉSTIMOS ═══ -->
+<section id="s-emp" class="sec">
+  <div class="stit"><span>💳 Empréstimos</span><button class="btn bv bsm" onclick="abrirEmp()">+ Novo</button></div>
+  <div id="lista-emp"></div>
+</section>
+
+<!-- ═══ RELATÓRIO ═══ -->
+<section id="s-rel" class="sec">
+  <div class="stit"><span>📋 Relatório</span></div>
+
+  <div class="card">
+    <div class="ch">
+      <span class="ct">📢 Geral do Grupo</span>
+      <button class="btn bv bsm" onclick="gerarGeral()">🔄 Gerar</button>
+    </div>
+    <div style="padding:12px;">
+      <div class="ibox">Enviado para o grupo — não exibe empréstimos individuais.</div>
+      <div class="rprv" id="rGeralTxt">Clique em Gerar.</div>
+      <div class="rbtns" id="rGeralShare" style="display:none;">
+        <button class="rbtn" onclick="rW('rGeralTxt')">💬 WhatsApp</button>
+        <button class="rbtn" onclick="rT('rGeralTxt')">✈️ Telegram</button>
+        <button class="rbtn" onclick="rC('rGeralTxt')">📋 Copiar</button>
+        <button class="rbtn" onclick="window.print()">📄 PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct">👤 Individual (privado)</span></div>
+    <div style="padding:12px;">
+      <div class="ibox">Situação completa — envie direto no WhatsApp de cada participante.</div>
+      <div class="fg">
+        <label class="fl">Participante</label>
+        <select class="fc" id="selRelP" onchange="gerarInd()"></select>
+      </div>
+      <div class="rprv" id="rIndTxt">Selecione um participante.</div>
+      <div class="rbtns" id="rIndShare" style="display:none;">
+        <button class="rbtn" onclick="envInd()">💬 Enviar por WhatsApp</button>
+        <button class="rbtn" onclick="rC('rIndTxt')">📋 Copiar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HISTÓRICO ═══ -->
+<section id="s-hist" class="sec">
+  <div class="stit"><span>🕒 Histórico</span></div>
+  <div id="hBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;"></div>
+  <div id="hDetalhe" style="display:none;" class="card">
+    <div class="ch"><span class="ct" id="hNome">—</span><button class="btn bo2 bsm" onclick="document.getElementById('hDetalhe').style.display='none'">✕</button></div>
+    <div style="padding:12px;" id="hCorpo"></div>
+  </div>
+</section>
+
+<!-- ═══ CONTATOS ═══ -->
+<section id="s-cont" class="sec">
+  <div class="stit"><span>⚙️ Contatos</span></div>
+  <!-- Botão salvar fixo no topo, sempre visível -->
+  <button class="btn bv" style="width:100%;justify-content:center;margin-bottom:10px;padding:12px;font-size:.85rem;" onclick="salvCont()">💾 Salvar todos os contatos</button>
+  <div class="ibox">DDI + DDD + número, sem espaços ou traços. Exemplo: <strong>5591999998888</strong></div>
+  <div id="fCont"></div>
+  <!-- Botão salvar repetido no fim também -->
+  <button class="btn bv" style="width:100%;justify-content:center;margin-top:4px;padding:12px;font-size:.85rem;" onclick="salvCont()">💾 Salvar todos os contatos</button>
+</section>
+
+</main>
+
+<!-- NAV -->
+<nav class="nav-bot">
+  <button class="nb active" onclick="ir('s-painel',this)" style="position:relative;"><span class="ni">🏠</span>Início<span id="badge-alertas" class="badge" style="display:none;">0</span></button>
+  <button class="nb" onclick="ir('s-dash',this)"><span class="ni">📊</span>Dashboard</button>
+  <button class="nb" onclick="ir('s-part',this)"><span class="ni">👥</span>Pessoas</button>
+  <button class="nb" onclick="ir('s-emp',this)"><span class="ni">💳</span>Empréstimos</button>
+  <button class="nb" onclick="ir('s-rel',this)"><span class="ni">📋</span>Relatório</button>
+  <button class="nb" onclick="am('mMais')"><span class="ni">☰</span>Mais</button>
+</nav>
+
+<!-- MENU MAIS -->
+<div class="ov" id="mMais">
+  <div class="modal" style="padding-bottom:20px;">
+    <div class="modal-drag"></div>
+    <div class="mt">Menu <button class="xb" onclick="fm('mMais')">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+      <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 10px;" onclick="fm('mMais');ir('s-hist',document.querySelectorAll('.nb')[4])"><span style="font-size:1.3rem;">🕒</span>Histórico</button>
+      <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 10px;" onclick="fm('mMais');ir('s-cont',document.querySelectorAll('.nb')[5])"><span style="font-size:1.3rem;">⚙️</span>Contatos</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL COBRAR ══ -->
+<div class="ov" id="mCob">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="mt">📲 Cobrança WhatsApp <button class="xb" onclick="fm('mCob')">✕</button></div>
+    <div style="font-size:.72rem;color:var(--sub);margin-bottom:2px;">Mensagem gerada automaticamente:</div>
+    <div class="wprv" id="wMsg"></div>
+    <div id="warnTel" style="display:none;" class="alerta-v" style="margin-top:0;">⚠️ Telefone não cadastrado. Vá em Contatos para adicionar.</div>
+    <div class="wopts">
+      <button class="wbtn main" onclick="envW()">💬 Abrir WhatsApp agora</button>
+      <button class="wbtn" onclick="copMsg()">📋 Copiar mensagem</button>
+      <button class="wbtn" onclick="fm('mCob')">✕ Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL EMPRÉSTIMO ══ -->
+<div class="ov" id="mEmp">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="mt">💳 Novo Empréstimo <button class="xb" onclick="fm('mEmp')">✕</button></div>
+    <div class="fg">
+      <label class="fl">Tipo de tomador</label>
+      <select class="fc" id="eTipo" onchange="toggleET()">
+        <option value="p">Participante da caixinha</option>
+        <option value="t">Terceiro (precisa de responsável)</option>
+      </select>
+    </div>
+    <div id="gPart" class="fg">
+      <label class="fl">Tomador</label>
+      <select class="fc" id="eTomP"></select>
+    </div>
+    <div id="gText" class="fg" style="display:none;">
+      <label class="fl">Nome do terceiro</label>
+      <input class="fc" id="eTomT" placeholder="Nome completo">
+    </div>
+    <div id="gResp" class="fg" style="display:none;">
+      <label class="fl">Participante responsável</label>
+      <select class="fc" id="eResp"></select>
+    </div>
+    <div class="fg">
+      <label class="fl">Valor (R$)</label>
+      <div class="money-wrap">
+        <span class="money-prefix">R$</span>
+        <input class="fc money-input" type="text" id="eVal" placeholder="0,00" oninput="fmtMoney(this);calcE();" inputmode="decimal">
+      </div>
+    </div>
+    <div class="cbox">
+      <div class="cr"><span style="color:var(--sub)">Valor</span><span id="ecV">R$ 0,00</span></div>
+      <div class="cr"><span style="color:var(--sub)">Juros fixos 20%</span><span style="color:var(--am)" id="ecJ">R$ 0,00</span></div>
+      <div class="cr tot"><span>Total a devolver</span><span style="color:var(--g)" id="ecT">R$ 0,00</span></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Data do empréstimo</label>
+      <input class="fc" type="date" id="eData">
+    </div>
+    <div class="fg">
+      <label class="fl">Vencimento do 1º pagamento de juros</label>
+      <input class="fc" type="date" id="eVenc">
+    </div>
+    <div class="fg">
+      <label class="fl">Observação (opcional)</label>
+      <input class="fc" id="eObs" placeholder="Ex: parcelado, garantia...">
+    </div>
+    <div style="display:flex;gap:7px;margin-top:12px;">
+      <button class="btn bv" style="flex:1;" onclick="salvE()">💳 Registrar</button>
+      <button class="btn bo2" onclick="fm('mEmp')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL PAGAMENTO PARCIAL ══ -->
+<div class="ov" id="mPgto">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="mt">💵 Lançar Pagamento <button class="xb" onclick="fm('mPgto')">✕</button></div>
+    <div class="cbox" id="pgtoSum" style="margin-top:0;margin-bottom:11px;"></div>
+    <div class="fg">
+      <label class="fl">Valor pago agora (R$)</label>
+      <div class="money-wrap">
+        <span class="money-prefix">R$</span>
+        <input class="fc money-input" type="text" id="pgtoVal" placeholder="0,00" oninput="fmtMoney(this);calcPgto();" inputmode="decimal" step="0.01">
+      </div>
+    </div>
+    <div class="cbox">
+      <div class="cr"><span style="color:var(--sub)">Juros (20% s/ saldo atual)</span><span style="color:var(--am)" id="pcJ">R$ 0,00</span></div>
+      <div class="cr"><span style="color:var(--sub)">Abate no principal</span><span style="color:var(--ac)" id="pcA">R$ 0,00</span></div>
+      <div class="cr tot"><span>Saldo restante</span><span style="color:var(--g)" id="pcS">R$ 0,00</span></div>
+    </div>
+    <div style="font-size:.72rem;min-height:18px;margin-bottom:8px;" id="pgtoAviso"></div>
+    <div style="display:flex;gap:7px;">
+      <button class="btn bv" style="flex:1;" onclick="confirmarPgto()">✅ Confirmar</button>
+      <button class="btn bo2" onclick="fm('mPgto')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM ══ -->
+<div class="ov" id="mCnf">
+  <div class="cnf-box">
+    <div style="font-size:1.7rem;margin-bottom:6px;">⚠️</div>
+    <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.92rem;" id="cnfTit"></div>
+    <p id="cnfMsg"></p>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button class="btn bd" id="cnfOk">Confirmar</button>
+      <button class="btn bo2" onclick="fm('mCnf')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════
+   CONSTANTES & ESTADO
+══════════════════════════════ */
+const CVAL=150, JTAXA=0.20;
+const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MA=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+let MES=5, cobP=null, pgtoIdx=null;
+
+function mkP(id,nome,cotas){
+  return{id,nome,cotas,tel:'',
+    hist:new Array(12).fill(false),
+    datas:new Array(12).fill(null)};
+}
+
+let PS=[
+  mkP(1,'Angela Miranda',2), mkP(2,'Caio Neves',2),
+  mkP(3,'Christian Alves',1), mkP(4,'Claudia Protazio',1),
+  mkP(5,'Cristina Protazio',2), mkP(6,'Cristiane Protazio',2),
+  mkP(7,'Evelyn Alves',1), mkP(8,'Ewerton Mescouto',2),
+  mkP(9,'João Vitor Silva',1), mkP(10,'Nonato',1),
+];
+let EMPS=[];
+
+/* ══════════════════════════════
+   LOCALSTORAGE
+══════════════════════════════ */
+function salv(){
+  localStorage.setItem('cx26p',JSON.stringify(PS));
+  localStorage.setItem('cx26e',JSON.stringify(EMPS));
+}
+function load(){
+  try{
+    const p=localStorage.getItem('cx26p'),e=localStorage.getItem('cx26e');
+    if(p) PS=JSON.parse(p);
+    if(e) EMPS=JSON.parse(e);
+    // Migração de campos
+    PS.forEach(x=>{
+      if(!x.hist) x.hist=new Array(12).fill(false);
+      if(!x.datas) x.datas=new Array(12).fill(null);
+    });
+    EMPS.forEach(x=>{
+      if(!x.pagamentos) x.pagamentos=[];
+      if(x.saldoDevedor===undefined) x.saldoDevedor=x.valor;
+      if(!x.dataEmprestimo) x.dataEmprestimo=x.dataCriacao||'';
+    });
+  }catch(err){console.warn('Erro ao carregar dados:',err);}
+}
+
+/* ══════════════════════════════
+   FORMATAÇÃO MOEDA
+══════════════════════════════ */
+function f(v){
+  return'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fD(d){
+  if(!d) return'—';
+  const[y,m,dd]=d.split('-');
+  return dd+'/'+m+'/'+y;
+}
+// Formata campo de input como moeda em tempo real
+function fmtMoney(el){
+  let raw=el.value.replace(/\D/g,'');
+  if(!raw){el.value='';return;}
+  let num=parseInt(raw,10)/100;
+  el.value=num.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+// Lê valor numérico de campo formatado
+function lerMoney(id){
+  const v=(document.getElementById(id)?.value||'').replace(/\./g,'').replace(',','.');
+  return parseFloat(v)||0;
+}
+// Juros sempre sobre o saldo devedor atual
+function calcJ(saldo){return +(saldo*JTAXA).toFixed(2);}
+
+/* ══════════════════════════════
+   NOTIFICAÇÕES AUTOMÁTICAS
+══════════════════════════════ */
+let notifAtivo=false;
+function toggleNotif(){
+  if(!('Notification' in window)){toast('⚠️ Navegador não suporta notificações.');return;}
+  if(notifAtivo){
+    notifAtivo=false;
+    localStorage.removeItem('cx26notif');
+    document.getElementById('btnNotif').classList.remove('on');
+    toast('🔕 Alertas desativados.');
+    return;
+  }
+  Notification.requestPermission().then(p=>{
+    if(p==='granted'){
+      notifAtivo=true;
+      localStorage.setItem('cx26notif','1');
+      document.getElementById('btnNotif').classList.add('on');
+      toast('🔔 Alertas ativados!');
+      verificarAlertas();
+    } else {
+      toast('⚠️ Permissão negada para notificações.');
+    }
+  });
+}
+
+function notifAuto(titulo,corpo){
+  if(!notifAtivo||Notification.permission!=='granted') return;
+  try{ new Notification(titulo,{body:corpo,icon:'https://cdn.jsdelivr.net/emojione/assets/svg/1f4b0.svg'}); }catch(e){}
+}
+
+function verificarAlertas(){
+  if(!notifAtivo) return;
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const vencCota=new Date(hoje.getFullYear(),MES,10);
+  const diffCota=Math.ceil((vencCota-hoje)/86400000);
+
+  // Alerta cotas
+  const pend=PS.filter(p=>!p.hist[MES]);
+  if(diffCota===7 && pend.length>0){
+    notifAuto('Caixinha 2026',`${pend.length} participante(s) com cota vencendo em 7 dias!`);
+  }
+  if(diffCota<0 && pend.length>0){
+    notifAuto('Caixinha 2026 - Cotas atrasadas',`${pend.length} participante(s) com cota de ${MN[MES]} atrasada.`);
+  }
+
+  EMPS.filter(e=>!e.quitado&&e.venc).forEach(e=>{
+    const venc=new Date(e.venc); venc.setHours(0,0,0,0);
+    const diff=Math.ceil((venc-hoje)/86400000);
+    if(diff===7){
+      notifAuto(`Emprestimo - ${e.tomador}`,`Vence em 7 dias (${fD(e.venc)}). Juros: ${f(calcJ(e.saldoDevedor||e.valor))}`);
+    }
+    if(diff<0){
+      notifAuto(`Emprestimo atrasado - ${e.tomador}`,`Atrasado ha ${Math.abs(diff)} dia(s). Saldo: ${f(e.saldoDevedor||e.valor)}`);
+    }
+  });
+}
+
+/* ══════════════════════════════
+   STATUS COTA (vence dia 10)
+══════════════════════════════ */
+function gSt(p){
+  if(p.hist[MES]) return{c:'sv',t:'🟢 Em dia'};
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const venc=new Date(hoje.getFullYear(),MES,10); venc.setHours(0,0,0,0);
+  const d=Math.ceil((venc-hoje)/86400000);
+  if(d<0) return{c:'sr',t:'🔴 Atrasado'};
+  if(d<=7) return{c:'sa',t:`🟡 Vence dia 10 (${d}d)`};
+  return{c:'sa',t:`🟡 Dia 10/${String(MES+1).padStart(2,'0')}`};
+}
+
+/* ══════════════════════════════
+   KPIs
+══════════════════════════════ */
+function kpis(){
+  const pag=PS.filter(p=>p.hist[MES]);
+  const totC=pag.reduce((a,p)=>a+p.cotas*CVAL,0);
+  const eAt=EMPS.filter(e=>!e.quitado);
+  const totE=eAt.reduce((a,e)=>a+(e.saldoDevedor??e.valor),0);
+  const totJ=eAt.reduce((a,e)=>a+calcJ(e.saldoDevedor??e.valor),0);
+  document.getElementById('kSaldo').textContent=f(totC-totE);
+  document.getElementById('kCotas').textContent=f(totC);
+  document.getElementById('kCotasSb').textContent=pag.length+' pagaram';
+  document.getElementById('kEmp').textContent=f(totE);
+  document.getElementById('kEmpSb').textContent=eAt.length+' ativo(s)';
+  document.getElementById('kJuros').textContent=f(totJ);
+  const pct=PS.length?Math.round(pag.length/PS.length*100):0;
+  document.getElementById('pBar').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=pag.length+'/'+PS.length+' pagaram em '+MN[MES];
+  document.getElementById('pPct').textContent=pct+'%';
+  document.getElementById('pTit').textContent='📈 '+MN[MES]+'/2026';
+}
+
+/* ══════════════════════════════
+   DASHBOARD GERENCIAL
+══════════════════════════════ */
+function renderDashboard(){
+  const hoje=new Date();
+  document.getElementById('dash-data').textContent=hoje.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('dashMesLabel').textContent=MA[MES];
+
+  // Cálculos base
+  const pagMes=PS.filter(p=>p.hist[MES]);
+  const pendMes=PS.filter(p=>!p.hist[MES]);
+  const arrMes=pagMes.reduce((a,p)=>a+p.cotas*CVAL,0);
+  const arrTotal=PS.reduce((a,p)=>a+p.hist.reduce((b,v,i)=>b+(v?p.cotas*CVAL:0),0),0);
+  const eAt=EMPS.filter(e=>!e.quitado);
+  const totEmp=eAt.reduce((a,e)=>a+(e.saldoDevedor??e.valor),0);
+  const totJuros=eAt.reduce((a,e)=>a+calcJ(e.saldoDevedor??e.valor),0);
+  const saldo=arrMes-totEmp;
+  const aReceber=totEmp+totJuros;
+  // Total previsto = saldo atual + juros a receber + cotas pendentes
+  const cotasPend=pendMes.reduce((a,p)=>a+p.cotas*CVAL,0);
+  const previsto=arrMes+totJuros+cotasPend;
+
+  // Preencher KPIs
+  document.getElementById('dSaldo').textContent=f(arrTotal-totEmp);
+  document.getElementById('dArrMes').textContent=f(arrMes);
+  document.getElementById('dArrMesSb').textContent=pagMes.length+' de '+PS.length+' pagaram';
+  document.getElementById('dArrTotal').textContent=f(arrTotal);
+  document.getElementById('dArrTotalSb').textContent='todos os meses pagos';
+  document.getElementById('dEmp').textContent=f(totEmp);
+  document.getElementById('dEmpSb').textContent=eAt.length+' empréstimo(s) ativo(s)';
+  document.getElementById('dJuros').textContent=f(totJuros);
+  document.getElementById('dReceber').textContent=f(aReceber);
+  document.getElementById('dPrevisto').textContent=f(previsto);
+  document.getElementById('dNPag').textContent=pagMes.length;
+  document.getElementById('dNPend').textContent=pendMes.length;
+  document.getElementById('dNEmp').textContent=eAt.length;
+
+  // ── Gráfico de barras anual ──
+  const maxVal=PS.reduce((a,p)=>Math.max(a,p.cotas*CVAL*PS.length),0)||1;
+  const barH=72; // px máximo
+  let barHtml='';
+  for(let i=0;i<12;i++){
+    const pagosMes=PS.filter(p=>p.hist[i]).reduce((a,p)=>a+p.cotas*CVAL,0);
+    const totalMes=PS.reduce((a,p)=>a+p.cotas*CVAL,0);
+    const hPago=Math.round((pagosMes/totalMes)*barH);
+    const hPend=barH-hPago;
+    const isCur=i===MES;
+    barHtml+=`<div class="bar-col">
+      <div style="width:100%;height:${barH}px;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;">
+        ${hPend>0?`<div class="bar pend" style="height:${hPend}px;opacity:${isCur?1:.5};"></div>`:''}
+        ${hPago>0?`<div class="bar pago" style="height:${hPago}px;opacity:${isCur?1:.6};"></div>`:''}
+      </div>
+      <div class="bar-lbl" style="color:${isCur?'var(--g)':'var(--sub)'};">${MA[i]}</div>
+    </div>`;
+  }
+  document.getElementById('dashBarChart').innerHTML=barHtml;
+
+  // ── Ranking participantes ──
+  const rank=[...PS].map(p=>({
+    nome:p.nome,
+    total:p.hist.reduce((a,v,i)=>a+(v?p.cotas*CVAL:0),0),
+    meses:p.hist.filter(Boolean).length,
+    cotas:p.cotas
+  })).sort((a,b)=>b.total-a.total);
+  const maxT=rank[0]?.total||1;
+  document.getElementById('dashRanking').innerHTML=rank.map((r,i)=>{
+    const cls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+    const pct=Math.round((r.total/maxT)*100);
+    return`<div class="rank-row">
+      <div class="rank-num ${cls}">${i+1}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.nome}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+          <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:${pct}%;"></div></div>
+          <span style="font-size:.65rem;color:var(--sub);white-space:nowrap;">${r.meses}/12</span>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:.8rem;font-weight:700;color:var(--g);">${f(r.total)}</div>
+        <div style="font-size:.62rem;color:var(--sub);">${r.cotas} cota${r.cotas>1?'s':''}/mês</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Pendentes do mês ──
+  const pEl=document.getElementById('dashPendentes');
+  if(!pendMes.length){
+    pEl.innerHTML='<div style="color:var(--g);font-size:.82rem;padding:4px 0;">✅ Todos pagaram em '+MN[MES]+'!</div>';
+  } else {
+    pEl.innerHTML=pendMes.map(p=>`
+      <div class="rank-row">
+        <div style="flex:1;">
+          <div style="font-size:.82rem;font-weight:600;">${p.nome}</div>
+          <div style="font-size:.7rem;color:var(--sub);">${p.cotas} cota${p.cotas>1?'s':''} · ${f(p.cotas*CVAL)}</div>
+        </div>
+        <button class="btn bw bsm" onclick="abrirCob(${p.id})">📲 Cobrar</button>
+      </div>`).join('');
+  }
+
+  // ── Empréstimos ativos ──
+  const eEl=document.getElementById('dashEmps');
+  document.getElementById('dashEmpCard').style.display=eAt.length?'block':'none';
+  if(eAt.length){
+    eEl.innerHTML=eAt.map((e,i)=>{
+      const saldo=e.saldoDevedor??e.valor;
+      const juros=calcJ(saldo);
+      const venc=e.venc?new Date(e.venc):null;
+      const diff=venc?Math.ceil((venc-hoje)/86400000):null;
+      const atras=diff!==null&&diff<0;
+      return`<div class="rank-row">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.82rem;font-weight:600;">${e.tomador}</div>
+          <div style="font-size:.7rem;color:var(--sub);">Saldo: <strong style="color:var(--g);">${f(saldo)}</strong> · Juros: <strong style="color:var(--am);">${f(juros)}</strong></div>
+          <div style="font-size:.68rem;color:${atras?'var(--vm)':'var(--sub)'};">Vence: ${fD(e.venc)} ${atras?'🔴 ATRASADO':''}</div>
+        </div>
+        <button class="btn bw bsm" onclick="cobrarE(${EMPS.indexOf(e)})">📲</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+
+function alertas(){
+  const el=document.getElementById('alertas');
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  let html='',cnt=0;
+
+  // ── Alertas de empréstimo ──
+  EMPS.filter(e=>!e.quitado&&e.venc).forEach((e,i)=>{
+    const venc=new Date(e.venc); venc.setHours(0,0,0,0);
+    const diff=Math.ceil((venc-hoje)/86400000);
+    const saldo=e.saldoDevedor??e.valor;
+    const juros=calcJ(saldo);
+    if(diff<0){
+      cnt++;
+      html+=`<div class="alerta-a"><span>🔴</span><div style="flex:1;">
+        <strong>${e.tomador}</strong> — empréstimo atrasado ${Math.abs(diff)}d<br>
+        <span style="color:var(--sub)">Saldo: ${f(saldo)} | Juros: ${f(juros)}</span><br>
+        <button class="btn bw bsm" style="margin-top:5px;" onclick="cobrarE(${EMPS.indexOf(e)})">📲 Cobrar</button>
+      </div></div>`;
+    } else if(diff<=7){
+      cnt++;
+      html+=`<div class="alerta-v"><span>⏰</span><div style="flex:1;">
+        <strong>${e.tomador}</strong> — vence ${diff===0?'<strong>hoje</strong>':diff==='1'?'amanhã':'em '+diff+'d'} (${fD(e.venc)})<br>
+        <span style="color:var(--sub)">Saldo: ${f(saldo)} | Juros: <strong style="color:var(--am)">${f(juros)}</strong></span><br>
+        <button class="btn bw bsm" style="margin-top:5px;" onclick="cobrarE(${EMPS.indexOf(e)})">📲 Avisar</button>
+      </div></div>`;
+    }
+  });
+
+  // ── Alertas de cotas ──
+  const vencCota=new Date(hoje.getFullYear(),MES,10);
+  const diffCota=Math.ceil((vencCota-hoje)/86400000);
+  const pend=PS.filter(p=>!p.hist[MES]);
+
+  if(pend.length>0){
+    if(diffCota<0){
+      pend.forEach(p=>{
+        cnt++;
+        html+=`<div class="alerta-a" style="margin-top:5px;"><span>🔴</span><div style="flex:1;">
+          <strong>${p.nome}</strong> — cota ${MN[MES]} atrasada<br>
+          <span style="color:var(--sub)">${p.cotas} cota${p.cotas>1?'s':''} · ${f(p.cotas*CVAL)}</span><br>
+          <button class="btn bw bsm" style="margin-top:5px;" onclick="abrirCob(${p.id})">📲 Cobrar</button>
+        </div></div>`;
+      });
+    } else if(diffCota<=7){
+      cnt+=pend.length;
+      html+=`<div class="alerta-v" style="margin-top:${EMPS.length?'7px':'0'};">
+        <span>⏰</span><div style="flex:1;">
+        <strong>${pend.length} participante(s)</strong> ainda não pagaram<br>
+        <span style="color:var(--sub)">Vencimento: dia 10/${String(MES+1).padStart(2,'0')}/2026 ${diffCota===0?'(<strong>hoje</strong>)':'('+diffCota+'d)'}</span>
+        </div></div>`;
+      pend.forEach(p=>{
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(30,42,64,.4);">
+          <div><strong style="font-size:.8rem;">${p.nome}</strong><span style="font-size:.72rem;color:var(--sub);margin-left:5px;">${f(p.cotas*CVAL)}</span></div>
+          <button class="btn bw bsm" onclick="abrirCob(${p.id})">📲</button>
+        </div>`;
+      });
+    } else {
+      pend.forEach(p=>{
+        const st=gSt(p);
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(30,42,64,.4);">
+          <div><strong style="font-size:.8rem;">${p.nome}</strong><span class="st ${st.c}" style="margin-left:5px;">${st.t}</span></div>
+          <button class="btn bw bsm" onclick="abrirCob(${p.id})">📲</button>
+        </div>`;
+      });
+    }
+  }
+
+  if(!html){
+    html='<div class="alerta-g"><span>✅</span><span>Tudo em dia! Sem pendências.</span></div>';
+  }
+  el.innerHTML=html;
+
+  // Badge no nav
+  const badge=document.getElementById('badge-alertas');
+  if(cnt>0){badge.textContent=cnt;badge.style.display='inline';}
+  else badge.style.display='none';
+}
+
+/* ══════════════════════════════
+   PARTICIPANTES
+══════════════════════════════ */
+function renderPart(){
+  const busca=(document.getElementById('busca')?.value||'').toLowerCase();
+  const at=PS.filter(p=>!p.hist[MES]);
+  document.getElementById('nAtras').textContent=at.length;
+  document.getElementById('lote').style.display=at.length?'flex':'none';
+  const lista=PS.filter(p=>p.nome.toLowerCase().includes(busca));
+  document.getElementById('lista-part').innerHTML=lista.map(p=>{
+    const pago=p.hist[MES],st=gSt(p),data=p.datas[MES]||'';
+    return`<div class="part-item ${pago?'pago-ok':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:6px;">
+        <strong style="font-size:.87rem;">${p.nome}</strong>
+        <span class="st ${st.c}">${st.t}</span>
+      </div>
+      <div style="font-size:.75rem;color:var(--sub);margin-bottom:8px;">
+        ${p.cotas} cota${p.cotas>1?'s':''} · <strong style="color:var(--tx);">${f(p.cotas*CVAL)}</strong> · vence dia 10/${String(MES+1).padStart(2,'0')}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;">
+        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+          <input type="checkbox" class="ck" ${pago?'checked':''} onchange="togPag(${p.id},this.checked)">
+          <span style="font-size:.8rem;font-weight:600;color:${pago?'var(--g)':'var(--sub)'};">
+            ${pago?'✅ Pago'+(data?' em '+fD(data):''):'⬜ Marcar como pago'}
+          </span>
+        </label>
+        <div style="display:flex;gap:5px;">
+          ${!pago?`<button class="btn bw bsm" onclick="abrirCob(${p.id})">📲</button>`:''}
+          <button class="btn bo2 bsm" onclick="verHist(${p.id})">📋</button>
+        </div>
+      </div>
+      ${pago?`<div style="margin-top:7px;">
+        <label style="font-size:.68rem;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Data do pagamento</label>
+        <input type="date" style="background:var(--bg2);border:1px solid var(--bo);border-radius:6px;padding:4px 8px;color:var(--tx);font-size:.74rem;outline:none;font-family:inherit;margin-top:3px;display:block;" value="${data}" onchange="setData(${p.id},this.value)">
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function togPag(id,ok){
+  const p=PS.find(x=>x.id===id);
+  p.hist[MES]=ok;
+  if(ok&&!p.datas[MES]) p.datas[MES]=new Date().toISOString().split('T')[0];
+  if(!ok) p.datas[MES]=null;
+  salv();atualizar();
+  toast(ok?`✅ ${p.nome} — pago!`:`↩ ${p.nome} — pendente`);
+}
+function setData(id,v){PS.find(x=>x.id===id).datas[MES]=v;salv();toast('📅 Data salva!');}
+function todosOk(){
+  PS.forEach(p=>{p.hist[MES]=true;if(!p.datas[MES])p.datas[MES]=new Date().toISOString().split('T')[0];});
+  salv();atualizar();toast('✅ Todos marcados como pagos!');
+}
+function limparMes(){
+  cnf('Limpar '+MN[MES]+'?','Todos os pagamentos do mês serão desmarcados.',()=>{
+    PS.forEach(p=>{p.hist[MES]=false;p.datas[MES]=null;});salv();atualizar();toast('↩ Mês limpo.');
+  });
+}
+
+/* ══════════════════════════════
+   COBRAR COTA
+══════════════════════════════ */
+function abrirCob(id){
+  cobP=PS.find(p=>p.id===id);
+  // Emojis seguros: ✅❌⭐💰💳⏰⚠ funcionam em todos os aparelhos
+  const msg=`Ola, ${cobP.nome}! ⭐\n\nSua cota da *Caixinha 2026* referente a *${MN[MES]}* esta em aberto.\n\n*Detalhes:*\n- Cotas: ${cobP.cotas}\n- Valor: *${f(cobP.cotas*CVAL)}*\n- Vencimento: dia 10/${String(MES+1).padStart(2,'0')}/2026\n\nFavor regularizar o pagamento. ✅\n\nObrigado!`;
+  document.getElementById('wMsg').textContent=msg;
+  const tem=(cobP.tel||'').replace(/\D/g,'');
+  document.getElementById('warnTel').style.display=tem?'none':'flex';
+  am('mCob');
+}
+
+function abrirLink(url){
+  // Cria <a> invisível e clica — funciona no iOS Safari sem ser bloqueado
+  const a=document.createElement('a');
+  a.href=url;
+  a.target='_blank';
+  a.rel='noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>a.remove(),500);
+}
+
+function envW(){
+  if(!cobP) return;
+  const tel=(cobP.tel||'').replace(/\D/g,'');
+  if(!tel){toast('⚠️ Cadastre o telefone em Contatos!');return;}
+  const msg=encodeURIComponent(document.getElementById('wMsg').textContent);
+  abrirLink('https://wa.me/'+tel+'?text='+msg);
+  fm('mCob');
+}
+function copMsg(){navigator.clipboard.writeText(document.getElementById('wMsg').textContent).then(()=>toast('📋 Mensagem copiada!'));}
+
+function cobrarTodos(){
+  const at=PS.filter(p=>!p.hist[MES]);
+  const com=at.filter(p=>(p.tel||'').replace(/\D/g,''));
+  const sem=at.length-com.length;
+  if(sem>0) toast(`⚠️ ${sem} participante(s) sem telefone cadastrado!`);
+  if(!com.length){if(!sem)toast('✅ Nenhum atrasado!');return;}
+  com.forEach((p,i)=>{
+    setTimeout(()=>{
+      const tel=p.tel.replace(/\D/g,'');
+      const msg=encodeURIComponent(`Ola, ${p.nome}! ⭐\n\nSua cota da *Caixinha 2026* de *${MN[MES]}* esta em aberto.\n\n- Cotas: ${p.cotas}\n- Valor: *${f(p.cotas*CVAL)}*\n- Vencimento: dia 10/${String(MES+1).padStart(2,'0')}/2026\n\nFavor regularizar. ✅`);
+      abrirLink('https://wa.me/'+tel+'?text='+msg);
+    },i*1000);
+  });
+  toast(`📲 Abrindo WhatsApp para ${com.length} participante(s)...`);
+}
+
+/* ══════════════════════════════
+   EMPRÉSTIMOS
+══════════════════════════════ */
+function toggleET(){
+  const t=document.getElementById('eTipo').value;
+  document.getElementById('gPart').style.display=t==='p'?'block':'none';
+  document.getElementById('gText').style.display=t==='t'?'block':'none';
+  document.getElementById('gResp').style.display=t==='t'?'block':'none';
+}
+
+function calcE(){
+  const v=lerMoney('eVal');
+  document.getElementById('ecV').textContent=f(v);
+  document.getElementById('ecJ').textContent=f(v*JTAXA);
+  document.getElementById('ecT').textContent=f(v*(1+JTAXA));
+}
+
+function abrirEmp(){
+  const sp=document.getElementById('eTomP'),sr=document.getElementById('eResp');
+  sp.innerHTML=sr.innerHTML=PS.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  const hoje=new Date().toISOString().split('T')[0];
+  document.getElementById('eData').value=hoje;
+  // Vencimento padrão: dia 10 do mês seguinte
+  const v=new Date();v.setMonth(v.getMonth()+1);v.setDate(10);
+  document.getElementById('eVenc').value=v.toISOString().split('T')[0];
+  document.getElementById('eVal').value='';
+  document.getElementById('eObs').value='';
+  calcE();toggleET();
+  am('mEmp');
+}
+
+function salvE(){
+  const tipo=document.getElementById('eTipo').value;
+  let tom='',respId=null;
+  if(tipo==='p'){
+    const id=parseInt(document.getElementById('eTomP').value);
+    tom=PS.find(p=>p.id===id)?.nome||'';
+  } else {
+    tom=(document.getElementById('eTomT').value||'').trim();
+    respId=parseInt(document.getElementById('eResp').value);
+  }
+  const val=lerMoney('eVal');
+  const venc=document.getElementById('eVenc').value;
+  const dataE=document.getElementById('eData').value;
+  const obs=document.getElementById('eObs').value;
+  if(!tom||val<=0||!venc){toast('⚠️ Preencha todos os campos!');return;}
+  EMPS.push({
+    id:Date.now(),tomador:tom,tipo,respId,
+    responsavel:respId?PS.find(p=>p.id===respId)?.nome:null,
+    valor:val,saldoDevedor:val,
+    totalOriginal:+(val*(1+JTAXA)).toFixed(2),
+    venc,dataEmprestimo:dataE,dataCriacao:dataE,obs,
+    quitado:false,pagamentos:[]
+  });
+  salv();fm('mEmp');renderEmp();kpis();
+  toast('💳 Empréstimo de '+f(val)+' registrado!');
+}
+
+function renderEmp(){
+  const el=document.getElementById('lista-emp');
+  if(!EMPS.length){el.innerHTML='<div style="color:var(--sub);padding:16px;text-align:center;font-size:.82rem;">Nenhum empréstimo registrado.</div>';return;}
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  el.innerHTML=EMPS.map((e,i)=>{
+    const saldo=e.saldoDevedor??e.valor;
+    const juros=calcJ(saldo);
+    const venc=e.venc?new Date(e.venc):null;
+    if(venc) venc.setHours(0,0,0,0);
+    const diff=venc?Math.ceil((venc-hoje)/86400000):null;
+    const atras=!e.quitado&&diff!==null&&diff<0;
+    const proxVenc=!e.quitado&&diff!==null&&diff<=7&&diff>=0;
+    const cor=e.quitado?'var(--g)':atras?'var(--vm)':'var(--am)';
+    const sit=e.quitado?'✅ Quitado':atras?`🔴 Atrasado ${Math.abs(diff)}d`:proxVenc?`⏰ Vence em ${diff}d`:'🟡 Em aberto';
+    const totalPago=(e.pagamentos||[]).reduce((a,p)=>a+p.valor,0);
+    return`<div class="emp-card">
+      <div class="emp-nome">💳 ${e.tomador}
+        ${e.responsavel?`<span style="font-size:.69rem;color:var(--sub);font-weight:400;">(resp: ${e.responsavel})</span>`:''}
+        ${atras?'<span class="st sr" style="margin-left:auto;">Atrasado</span>':proxVenc?'<span class="st sa" style="margin-left:auto;">Vence em breve</span>':''}
+      </div>
+      ${e.dataEmprestimo?`<div class="er2"><span class="el">Data</span><span class="erv" style="color:var(--sub);">${fD(e.dataEmprestimo)}</span></div>`:''}
+      <div class="er2"><span class="el">Valor original</span><span class="erv">${f(e.valor)}</span></div>
+      <div class="er2"><span class="el">💰 Saldo devedor</span><span class="erv" style="color:var(--g);font-size:.9rem;">${f(saldo)}</span></div>
+      <div class="er2"><span class="el">Juros s/ saldo (20%)</span><span class="erv" style="color:var(--am);">${f(juros)}</span></div>
+      ${totalPago>0?`<div class="er2"><span class="el">Total já pago</span><span class="erv" style="color:var(--ac);">${f(totalPago)}</span></div>`:''}
+      <div class="er2"><span class="el">Vencimento juros</span><span class="erv" style="color:${atras?'var(--vm)':proxVenc?'var(--am)':''};">${fD(e.venc)}</span></div>
+      ${e.obs?`<div class="er2"><span class="el">Obs.</span><span class="erv" style="color:var(--sub);font-size:.72rem;">${e.obs}</span></div>`:''}
+      <div class="er2"><span class="el">Situação</span><span class="erv" style="color:${cor};">${sit}</span></div>
+
+      ${(e.pagamentos||[]).length?`
+      <div style="margin-top:8px;">
+        <div style="font-size:.66rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Histórico de pagamentos</div>
+        ${e.pagamentos.map(pg=>`<div class="plog">
+          <span>${fD(pg.data)}</span>
+          <span>💵 ${f(pg.valor)}</span>
+          <span style="color:var(--am);">j: ${f(pg.juros)}</span>
+          <span style="color:var(--ac);">-${f(pg.abate)}</span>
+          <span style="color:var(--g);">saldo: ${f(pg.saldoApos)}</span>
+        </div>`).join('')}
+      </div>`:''}
+
+      <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;">
+        ${!e.quitado?`
+          <button class="btn bw bsm" onclick="abrirPgto(${i})">💵 Lançar pgto</button>
+          <button class="btn bv bsm" onclick="quitarE(${i})">✅ Quitar</button>
+        `:''}
+        <button class="btn bw bsm" onclick="cobrarE(${i})">📲 Cobrar</button>
+        <button class="btn bd bsm" onclick="delE(${i})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   PAGAMENTO PARCIAL
+   Juros = 20% sobre saldo devedor atual
+══════════════════════════════ */
+function abrirPgto(i){
+  pgtoIdx=i;
+  const e=EMPS[i];
+  const saldo=e.saldoDevedor??e.valor;
+  const juros=calcJ(saldo);
+  document.getElementById('pgtoSum').innerHTML=`
+    <div style="font-weight:700;font-size:.86rem;margin-bottom:7px;">${e.tomador}</div>
+    <div class="cr"><span style="color:var(--sub)">Saldo devedor atual</span><span style="color:var(--g);font-weight:700;">${f(saldo)}</span></div>
+    <div class="cr"><span style="color:var(--sub)">Juros período (20% s/ saldo)</span><span style="color:var(--am);font-weight:700;">${f(juros)}</span></div>
+    <div style="padding-top:7px;border-top:1px solid var(--bo);font-size:.71rem;color:var(--sub);margin-top:3px;">
+      💡 Para pagar só juros: <strong>${f(juros)}</strong>. Para amortizar, pague mais.
+    </div>`;
+  document.getElementById('pgtoVal').value='';
+  document.getElementById('pcJ').textContent=f(juros);
+  document.getElementById('pcA').textContent=f(0);
+  document.getElementById('pcS').textContent=f(saldo);
+  document.getElementById('pgtoAviso').textContent='';
+  am('mPgto');
+}
+
+function calcPgto(){
+  if(pgtoIdx===null) return;
+  const e=EMPS[pgtoIdx];
+  const saldo=e.saldoDevedor??e.valor;
+  const juros=calcJ(saldo);
+  const pago=lerMoney('pgtoVal');
+  const pagJuros=+Math.min(pago,juros).toFixed(2);
+  const abate=+Math.max(0,pago-juros).toFixed(2);
+  const novoSaldo=+Math.max(0,saldo-abate).toFixed(2);
+  document.getElementById('pcJ').textContent=f(pagJuros);
+  document.getElementById('pcA').textContent=f(abate);
+  document.getElementById('pcS').textContent=f(novoSaldo);
+  const av=document.getElementById('pgtoAviso');
+  if(pago<=0) av.innerHTML='';
+  else if(pago<juros) av.innerHTML='<span style="color:var(--am)">⚠️ Cobre parte dos juros. Saldo não diminui.</span>';
+  else if(+(pago.toFixed(2))===+juros.toFixed(2)) av.innerHTML='<span style="color:var(--sub)">ℹ️ Cobre exatamente os juros. Saldo permanece.</span>';
+  else if(novoSaldo===0) av.innerHTML='<span style="color:var(--g)">🎉 Este pagamento quita o empréstimo!</span>';
+  else av.innerHTML=`<span style="color:var(--g)">✅ Abate ${f(abate)} do principal → novo saldo: ${f(novoSaldo)}</span>`;
+}
+
+function confirmarPgto(){
+  if(pgtoIdx===null) return;
+  const e=EMPS[pgtoIdx];
+  const saldo=e.saldoDevedor??e.valor;
+  const juros=calcJ(saldo);
+  const pago=lerMoney('pgtoVal');
+  if(pago<=0){toast('⚠️ Informe o valor pago!');return;}
+  const pagJuros=+Math.min(pago,juros).toFixed(2);
+  const abate=+Math.max(0,pago-juros).toFixed(2);
+  const novoSaldo=+Math.max(0,saldo-abate).toFixed(2);
+  e.pagamentos.push({
+    data:new Date().toISOString().split('T')[0],
+    valor:+pago.toFixed(2),juros:pagJuros,abate,saldoApos:novoSaldo
+  });
+  e.saldoDevedor=novoSaldo;
+  if(novoSaldo===0) e.quitado=true;
+  salv();fm('mPgto');renderEmp();kpis();alertas();
+  toast(novoSaldo===0?'✅ Empréstimo quitado!':`💵 Lançado! Novo saldo: ${f(novoSaldo)}`);
+}
+
+function quitarE(i){
+  cnf('Quitar empréstimo?',`${EMPS[i].tomador} — saldo ${f(EMPS[i].saldoDevedor??EMPS[i].valor)}`,()=>{
+    EMPS[i].quitado=true;EMPS[i].saldoDevedor=0;salv();renderEmp();kpis();alertas();toast('✅ Quitado!');
+  });
+}
+function delE(i){
+  cnf('Excluir empréstimo?','Esta ação não pode ser desfeita.',()=>{
+    EMPS.splice(i,1);salv();renderEmp();kpis();alertas();toast('🗑 Excluído.');
+  });
+}
+function cobrarE(i){
+  const e=EMPS[i];
+  let tel='';
+  if(e.tipo==='p'){const p=PS.find(x=>x.nome===e.tomador);tel=p?.tel||'';}
+  else if(e.respId){const r=PS.find(x=>x.id===e.respId);tel=r?.tel||'';}
+  tel=tel.replace(/\D/g,'');
+  if(!tel){toast('⚠️ Telefone não cadastrado para '+e.tomador+'!');return;}
+  const saldo=e.saldoDevedor??e.valor;
+  const juros=calcJ(saldo);
+  const msg=encodeURIComponent(`Ola, ${e.tomador}! ⭐\n\nSeu emprestimo na *Caixinha 2026* vence em *${fD(e.venc)}*.\n\n- Saldo devedor: *${f(saldo)}*\n- Juros do periodo (20% s/ saldo): *${f(juros)}*\n\nFavor regularizar. ✅`);
+  abrirLink('https://wa.me/'+tel+'?text='+msg);
+}
+
+/* ══════════════════════════════
+   RELATÓRIO GERAL (grupo)
+══════════════════════════════ */
+function gerarGeral(){
+  const pag=PS.filter(p=>p.hist[MES]);
+  const tot=pag.reduce((a,p)=>a+p.cotas*CVAL,0);
+  const eAt=EMPS.filter(e=>!e.quitado);
+  const totJ=eAt.reduce((a,e)=>a+calcJ(e.saldoDevedor??e.valor),0);
+  const totE=eAt.reduce((a,e)=>a+(e.saldoDevedor??e.valor),0);
+  let t=`*Participantes da Caixinha 2026* 💰\n📅 ${MN[MES]}/2026\n${'─'.repeat(28)}\n`;
+  PS.forEach(p=>t+=`${p.nome} - ${p.cotas} cota${p.cotas>1?'s':''} ${p.hist[MES]?'✅':'❌'}\n`);
+  t+=`${'─'.repeat(28)}\n`;
+  t+=`💰 Total arrecadado: *${f(tot)}*\n`;
+  if(eAt.length){
+    t+=`\n💳 Emprestimos ativos: *${eAt.length}*\n`;
+    t+=`💹 Juros a receber: *${f(totJ)}*\n`;
+  }
+  t+=`\n📊 *Saldo disponivel: ${f(tot-totE)}*`;
+  document.getElementById('rGeralTxt').textContent=t;
+  document.getElementById('rGeralShare').style.display='grid';
+  toast('📋 Relatório geral gerado!');
+}
+
+/* ══════════════════════════════
+   RELATÓRIO INDIVIDUAL (privado)
+══════════════════════════════ */
+function popSelRel(){
+  const s=document.getElementById('selRelP');
+  if(!s) return;
+  s.innerHTML=PS.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+}
+
+function gerarInd(){
+  const id=parseInt(document.getElementById('selRelP')?.value);
+  const p=PS.find(x=>x.id===id);
+  if(!p) return;
+  const totInv=p.hist.reduce((a,v,i)=>a+(v?p.cotas*CVAL:0),0);
+  const mP=p.hist.filter(Boolean).length;
+  const emps=EMPS.filter(e=>e.tomador===p.nome);
+  const mesAtualIdx=new Date().getMonth();
+  let t=`⭐ *Relatorio — ${p.nome}*\n*Caixinha 2026*\n${'─'.repeat(28)}\n`;
+  t+=`📅 *${MN[MES]}/2026:* `;
+  t+=p.hist[MES]?`✅ Pago${p.datas[MES]?' em '+fD(p.datas[MES]):''}`:  `❌ Pendente — ${f(p.cotas*CVAL)} - vence dia 10`;
+  t+='\n\n📊 *Resumo do ano:*\n';
+  t+=`- Meses pagos: ${mP}/12\n`;
+  t+=`- Total investido: *${f(totInv)}*\n`;
+  t+=`- Cotas mensais: ${p.cotas} x R$150 = *${f(p.cotas*CVAL)}/mes*\n`;
+  t+=`\n📆 *Historico 2026:*\n`;
+  for(let i=0;i<=mesAtualIdx;i++){
+    t+=`${MA[i]}: ${p.hist[i]?'✅ Pago'+(p.datas[i]?' ('+fD(p.datas[i])+')':''):'❌ Pendente'}\n`;
+  }
+  if(emps.length){
+    t+=`\n💳 *Emprestimos:*\n`;
+    emps.forEach(e=>{
+      const saldo=e.saldoDevedor??e.valor;
+      const juros=calcJ(saldo);
+      t+=`- Valor original: ${f(e.valor)}\n`;
+      t+=`  Saldo devedor: *${f(saldo)}*\n`;
+      t+=`  Juros (20% s/ saldo): ${f(juros)}\n`;
+      t+=`  Vencimento: ${fD(e.venc)}\n`;
+      t+=`  Situacao: ${e.quitado?'✅ Quitado':'❌ Em aberto'}\n`;
+    });
+  }
+  t+=`\nGerado em ${new Date().toLocaleDateString('pt-BR')} - Caixinha 2026`;
+  document.getElementById('rIndTxt').textContent=t;
+  document.getElementById('rIndShare').style.display='grid';
+}
+
+function envInd(){
+  const id=parseInt(document.getElementById('selRelP')?.value);
+  const p=PS.find(x=>x.id===id);
+  const tel=(p?.tel||'').replace(/\D/g,'');
+  if(!tel){toast('⚠️ Sem telefone de '+p?.nome+'. Cadastre em Contatos!');return;}
+  abrirLink('https://wa.me/'+tel+'?text='+encodeURIComponent(document.getElementById('rIndTxt').textContent));
+}
+
+function rW(id){abrirLink('https://wa.me/?text='+encodeURIComponent(document.getElementById(id).textContent));}
+function rT(id){window.open('https://t.me/share/url?url=&text='+encodeURIComponent(document.getElementById(id).textContent),'_blank');}
+function rC(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('📋 Copiado!'));}
+
+/* ══════════════════════════════
+   HISTÓRICO
+══════════════════════════════ */
+function renderHBtns(){
+  document.getElementById('hBtns').innerHTML=PS.map(p=>{
+    const ok=p.hist[MES],tot=p.hist.filter(Boolean).length;
+    return`<button onclick="verHist(${p.id})" style="background:var(--card);border:1px solid var(--bo);border-radius:10px;padding:10px;cursor:pointer;text-align:left;font-family:inherit;width:100%;transition:.15s;" onmousedown="this.style.background='var(--card2)'" onmouseup="this.style.background='var(--card)'">
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:2px;">${p.nome}</div>
+      <div style="font-size:.67rem;color:var(--sub);">${tot}/12 meses · ${ok?'✅ Em dia':'❌ Pendente'}</div>
+    </button>`;
+  }).join('');
+}
+
+function verHist(id){
+  const p=PS.find(x=>x.id===id);
+  const totR=p.hist.reduce((a,v,i)=>a+(v?p.cotas*CVAL:0),0);
+  const emps=EMPS.filter(e=>e.tomador===p.nome);
+  document.getElementById('hNome').textContent='📋 '+p.nome;
+  let h='<div class="hg">';
+  p.hist.forEach((ok,i)=>h+=`<div class="hm ${ok?'ok':'nd'}"><b>${MA[i]}</b>${ok?'✅':'❌'}</div>`);
+  h+='</div>';
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0;">
+    <div style="background:var(--bg2);border:1px solid var(--bo);border-radius:9px;padding:9px;text-align:center;">
+      <div style="font-size:.63rem;color:var(--sub);margin-bottom:2px;">Total Investido</div>
+      <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--g);font-size:.88rem;">${f(totR)}</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--bo);border-radius:9px;padding:9px;text-align:center;">
+      <div style="font-size:.63rem;color:var(--sub);margin-bottom:2px;">Empréstimos</div>
+      <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--am);font-size:.88rem;">${emps.length}</div>
+    </div>
+  </div>`;
+  if(emps.length){
+    h+=`<div style="font-size:.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;margin-bottom:5px;">Empréstimos</div>`;
+    emps.forEach(e=>{
+      const saldo=e.saldoDevedor??e.valor;
+      h+=`<div style="background:var(--bg2);border:1px solid var(--bo);border-radius:8px;padding:9px;margin-bottom:5px;font-size:.77rem;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub)">Valor</span><span>${f(e.valor)}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub)">Saldo devedor</span><span style="color:var(--g)">${f(saldo)}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub)">Juros s/ saldo</span><span style="color:var(--am)">${f(calcJ(saldo))}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub)">Vencimento</span><span>${fD(e.venc)}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub)">Situação</span><span style="color:${e.quitado?'var(--g)':'var(--vm)'};">${e.quitado?'✅ Quitado':'🔴 Em aberto'}</span></div>
+      </div>`;
+    });
+  }
+  document.getElementById('hCorpo').innerHTML=h;
+  document.getElementById('hDetalhe').style.display='block';
+  ir('s-hist',document.querySelectorAll('.nb')[4]);
+  setTimeout(()=>document.getElementById('hDetalhe').scrollIntoView({behavior:'smooth'}),80);
+}
+
+/* ══════════════════════════════
+   CONTATOS
+══════════════════════════════ */
+function renderCont(){
+  document.getElementById('fCont').innerHTML=PS.map(p=>`
+    <div style="background:var(--card2);border:1px solid var(--bo);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-weight:700;font-size:.83rem;margin-bottom:5px;color:var(--tx);">${p.nome}</div>
+      <input class="fc" type="tel" id="ct${p.id}" value="${p.tel||''}"
+        placeholder="5591999998888" inputmode="numeric" autocomplete="tel"
+        style="width:100%;padding:9px 11px;font-size:.86rem;"
+        oninput="this.value=this.value.replace(/\\D/g,'');PS.find(x=>x.id==${p.id}).tel=this.value;"
+        onblur="PS.find(x=>x.id==${p.id}).tel=this.value.replace(/\\D/g,'');">
+    </div>`).join('');
+}
+function salvCont(){
+  PS.forEach(p=>{
+    const el=document.getElementById('ct'+p.id);
+    if(el) p.tel=el.value.replace(/\D/g,'');
+  });
+  salv();toast('💾 Contatos salvos com sucesso!');
+}
+
+/* ══════════════════════════════
+   UTILS
+══════════════════════════════ */
+function am(id){document.getElementById(id).classList.add('open');}
+function fm(id){document.getElementById(id).classList.remove('open');}
+function cnf(t,m,cb){
+  document.getElementById('cnfTit').textContent=t;
+  document.getElementById('cnfMsg').textContent=m;
+  document.getElementById('cnfOk').onclick=()=>{fm('mCnf');cb();};
+  am('mCnf');
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000);
+}
+function trocarMes(){
+  MES=parseInt(document.getElementById('sel-mes').value);
+  atualizar();
+}
+function ir(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn){document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  if(id==='s-dash'){renderDashboard();}
+  if(id==='s-hist'){renderHBtns();}
+  if(id==='s-emp'){renderEmp();}
+  if(id==='s-cont'){renderCont();}
+  if(id==='s-rel'){gerarGeral();popSelRel();gerarInd();}
+  // Fechar modal mais se aberto
+  fm('mMais');
+}
+function irMais(btn){ am('mMais'); }
+function atualizar(){
+  kpis();alertas();renderPart();
+  // Atualiza dashboard se estiver visível
+  if(document.getElementById('s-dash').classList.contains('active')) renderDashboard();
+}
+
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+load();
+// Restaurar estado de notificações
+if(localStorage.getItem('cx26notif')==='1'){
+  if(Notification.permission==='granted'){
+    notifAtivo=true;
+    document.getElementById('btnNotif').classList.add('on');
+  }
+}
+popSelRel();
+document.getElementById('selRelP').addEventListener('change',gerarInd);
+atualizar();
+// Verificar alertas automáticos ao abrir
+verificarAlertas();
+</script>
+</body>
+</html>
