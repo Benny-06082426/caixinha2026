@@ -734,15 +734,38 @@ select.fc option{background:var(--bg2);}
   <div class="modal">
     <div class="mdrag"></div>
     <div class="mt" id="mRifaNumTit">📋 Numeros da Rifa <button class="xb" onclick="fm('mRifaNum')">✕</button></div>
-    <div class="ibox">Edite a quantidade de numeros de cada participante. O total sera atualizado automaticamente.</div>
+
+    <!-- Distribuição automática -->
+    <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:11px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:.72rem;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">⚡ Distribuição Automática</div>
+      <div class="fg">
+        <label class="fl">Critério de distribuição</label>
+        <select class="fc" id="distCriterio" onchange="previewDistrib()">
+          <option value="igual">Igualitário — mesma quantidade para todos</option>
+          <option value="cotas">Proporcional às cotas — quem tem mais cotas recebe mais</option>
+          <option value="manual_qtd">Quantidade fixa por participante (definir abaixo)</option>
+        </select>
+      </div>
+      <div class="fg" id="grpQtdFixa" style="display:none;">
+        <label class="fl">Numeros por participante</label>
+        <input class="fc" type="number" id="qtdFixa" value="10" min="1" oninput="previewDistrib()">
+      </div>
+      <div id="previewDistrib" style="font-size:.75rem;color:var(--sub);margin-bottom:8px;min-height:16px;"></div>
+      <button class="btn bv" style="width:100%;justify-content:center;padding:9px;" onclick="distribuirAuto()">⚡ Distribuir automaticamente</button>
+    </div>
+
+    <div class="ibox">Após a distribuição automática, você pode ajustar manualmente abaixo.</div>
     <div id="rifaNumLista"></div>
+
     <div class="cbox" style="margin-top:10px;">
       <div class="cr"><span style="color:var(--sub)">Numeros distribuidos</span><span id="rnDistrib" style="color:var(--g);">0</span></div>
       <div class="cr"><span style="color:var(--sub)">Total da rifa</span><span id="rnTotal">0</span></div>
       <div class="cr tot"><span>Disponíveis</span><span id="rnDisp" style="color:var(--am);">0</span></div>
     </div>
+    <div id="rnArrecad" style="font-size:.78rem;color:var(--g);text-align:center;margin-top:6px;font-weight:600;"></div>
     <div style="display:flex;gap:7px;margin-top:11px;">
       <button class="btn bv" style="flex:1;" onclick="salvarNumRifa()">💾 Salvar</button>
+      <button class="btn bd bsm" onclick="limparDistrib()">↩ Limpar</button>
       <button class="btn bo2" onclick="fm('mRifaNum')">Fechar</button>
     </div>
   </div>
@@ -1996,9 +2019,13 @@ function renderRifas(){
     return;
   }
   el.innerHTML=RIFAS.map((r,i)=>{
-    const arrecad=r.partic.reduce((a,p)=>a+p.numeros*r.valNum,0);
+    const arrecad=r.partic.reduce((a,p)=>{const pg=(p.bilhetes||[]).filter(b=>b.pago).length;return a+pg*r.valNum;},0);
+    const arrecadPrev=r.partic.reduce((a,p)=>a+p.numeros*r.valNum,0);
+    const totalBilh=r.partic.reduce((a,p)=>a+(p.bilhetes||[]).length,0);
+    const pagosBilh=r.partic.reduce((a,p)=>a+(p.bilhetes||[]).filter(b=>b.pago).length,0);
     const distrib=r.partic.reduce((a,p)=>a+p.numeros,0);
     const disp=r.totNum-distrib;
+    const pctPago=totalBilh>0?Math.round(pagosBilh/totalBilh*100):0;
     const corSt=r.status==='sorteada'?'var(--g)':r.status==='encerrada'?'var(--sub)':'var(--ac)';
     const stLabel=r.status==='sorteada'?'✅ Sorteada':r.status==='encerrada'?'🔒 Encerrada':'🎟️ Aberta';
     return`<div class="emp-card">
@@ -2013,20 +2040,37 @@ function renderRifas(){
       <div class="er2"><span class="el">Valor por numero</span><span class="erv" style="color:var(--g);">${f(r.valNum)}</span></div>
       <div class="er2"><span class="el">Premio</span><span class="erv" style="color:var(--am);">${r.premio>0?f(r.premio):'—'}</span></div>
       <div class="er2"><span class="el">Distribuidos</span><span class="erv">${distrib} / ${r.totNum}</span></div>
-      <div class="er2"><span class="el">Disponiveis</span><span class="erv" style="color:${disp>0?'var(--ac)':'var(--vm)'};">${disp}</span></div>
-      <div class="er2"><span class="el">💰 Arrecadado</span><span class="erv" style="color:var(--g);font-size:.9rem;">${f(arrecad)}</span></div>
+      <div class="er2"><span class="el">Pagos / Total</span><span class="erv" style="color:${pagosBilh===totalBilh&&totalBilh>0?'var(--g)':'var(--am)'};">${pagosBilh} / ${totalBilh}</span></div>
+      <div class="er2"><span class="el">💰 Arrecadado</span><span class="erv" style="color:var(--g);font-size:.9rem;">${f(arrecad)} <span style="color:var(--sub);font-size:.75rem;">/ ${f(arrecadPrev)}</span></span></div>
+      ${totalBilh>0?`<div style="margin:4px 0 6px;">
+        <div style="display:flex;justify-content:space-between;font-size:.67rem;color:var(--sub);margin-bottom:3px;"><span>Progresso de pagamento</span><span style="color:${pctPago===100?'var(--g)':'var(--am)'};">${pctPago}%</span></div>
+        <div style="height:5px;background:var(--bo);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${pctPago}%;background:${pctPago===100?'var(--g)':'var(--ac)'};border-radius:3px;transition:width .4s;"></div></div>
+      </div>`:''}
       ${r.obs?`<div class="er2"><span class="el">Obs.</span><span class="erv" style="color:var(--sub);font-size:.72rem;">${r.obs}</span></div>`:''}
       ${r.status==='sorteada'&&r.ganhador?`<div style="background:rgba(0,200,83,.08);border:1px solid rgba(0,200,83,.2);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.8rem;"><strong style="color:var(--g);">🏆 Ganhador: ${r.ganhador}</strong> — Numero: <strong>${r.numGanhador}</strong></div>`:''}
 
-      <!-- Lista de participantes resumida -->
+      <!-- Lista de participantes resumida com status de pagamento -->
       <div style="margin-top:10px;">
         <div style="font-size:.66rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Participantes</div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          ${r.partic.map(p=>`<div style="background:${p.numeros>0?'rgba(59,130,246,.12)':'var(--bg2)'};border:1px solid ${p.numeros>0?'rgba(59,130,246,.25)':'var(--bo)'};border-radius:7px;padding:4px 8px;font-size:.72rem;display:flex;align-items:center;gap:5px;">
-            <span style="font-weight:600;">${p.nome.split(' ')[0]}</span>
-            <span style="color:${p.numeros>0?'var(--ac)':'var(--sub)'};">${p.numeros} num.</span>
-            ${p.faixas?`<span style="color:var(--sub);font-size:.65rem;">(${p.faixas})</span>`:''}
-          </div>`).join('')}
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          ${r.partic.map(p=>{
+            const bilhs=p.bilhetes||[];
+            const pg=bilhs.filter(b=>b.pago).length;
+            const tot=bilhs.length||p.numeros;
+            const pct=tot>0?Math.round(pg/tot*100):0;
+            return`<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:${pg===tot&&tot>0?'rgba(0,200,83,.07)':'rgba(30,42,64,.4)'};border:1px solid ${pg===tot&&tot>0?'rgba(0,200,83,.2)':'var(--bo)'};border-radius:8px;">
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                  <span style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nome.split(' ')[0]}</span>
+                  <span style="font-size:.68rem;color:${pg===tot&&tot>0?'var(--g)':'var(--sub)'};">${pg}/${tot}${r.valNum>0?' · '+f(pg*r.valNum):''}</span>
+                </div>
+                <div style="height:4px;background:var(--bo);border-radius:2px;overflow:hidden;">
+                  <div style="height:100%;width:${pct}%;background:${pct===100?'var(--g)':'var(--ac)'};border-radius:2px;transition:width .4s;"></div>
+                </div>
+              </div>
+              ${p.faixas?`<span style="font-size:.65rem;color:var(--sub);flex-shrink:0;">${p.faixas}</span>`:''}
+            </div>`;
+          }).join('')}
         </div>
       </div>
 
@@ -2045,37 +2089,256 @@ function abrirNumRifa(i){
   rifaNumIdx=i;
   const r=RIFAS[i];
   document.getElementById('mRifaNumTit').innerHTML=`🔢 ${r.nome} <button class="xb" onclick="fm('mRifaNum')">✕</button>`;
+  // Reset critério para igualitário
+  document.getElementById('distCriterio').value='igual';
+  document.getElementById('grpQtdFixa').style.display='none';
   renderNumRifa();
+  previewDistrib();
   am('mRifaNum');
+}
+
+function previewDistrib(){
+  if(rifaNumIdx===null)return;
+  const r=RIFAS[rifaNumIdx];
+  const crit=document.getElementById('distCriterio').value;
+  const n=r.partic.length;
+  const grp=document.getElementById('grpQtdFixa');
+  grp.style.display=crit==='manual_qtd'?'block':'none';
+  const prev=document.getElementById('previewDistrib');
+
+  if(crit==='igual'){
+    const porPart=Math.floor(r.totNum/n);
+    const resto=r.totNum%n;
+    prev.innerHTML=`<span style="color:var(--ac);">${porPart} numeros por participante${resto>0?' ('+resto+' sobram — distribuidos nos primeiros)':' (distribuicao exata)'}</span>`;
+  } else if(crit==='cotas'){
+    const totCotas=r.partic.reduce((a,p)=>{const ps=PS.find(x=>x.id===p.id);return a+(ps?ps.cotas:1);},0)||n;
+    const porCota=r.totNum/totCotas;
+    prev.innerHTML=`<span style="color:var(--ac);">${porCota.toFixed(1)} numeros por cota — proporcional à participacao na caixinha</span>`;
+  } else if(crit==='manual_qtd'){
+    const q=parseInt(document.getElementById('qtdFixa').value)||0;
+    const total=q*n;
+    const diff=r.totNum-total;
+    prev.innerHTML=`<span style="color:${Math.abs(diff)>0?'var(--am)':'var(--g)'};">${q} × ${n} participantes = ${total} numeros${diff>0?' ('+diff+' sobrando)':diff<0?' ('+Math.abs(diff)+' a mais que o total!)':' ✅ exato'}</span>`;
+  }
+}
+
+function distribuirAuto(){
+  if(rifaNumIdx===null)return;
+  const r=RIFAS[rifaNumIdx];
+  const crit=document.getElementById('distCriterio').value;
+  const n=r.partic.length;
+  if(!n){toast('⚠️ Nenhum participante!');return;}
+
+  // Calcula quantidades
+  let qtds=[];
+  if(crit==='igual'){
+    const base=Math.floor(r.totNum/n);
+    const resto=r.totNum%n;
+    qtds=r.partic.map((_,i)=>base+(i<resto?1:0));
+  } else if(crit==='cotas'){
+    const totCotas=r.partic.reduce((a,p)=>{const ps=PS.find(x=>x.id===p.id);return a+(ps?ps.cotas:1);},0)||n;
+    let acum=0;
+    qtds=r.partic.map((p,i)=>{
+      const ps=PS.find(x=>x.id===p.id);
+      const cotas=ps?ps.cotas:1;
+      if(i===n-1) return r.totNum-acum; // ultimo pega o resto
+      const q=Math.round((cotas/totCotas)*r.totNum);
+      acum+=q;
+      return q;
+    });
+  } else if(crit==='manual_qtd'){
+    const q=parseInt(document.getElementById('qtdFixa').value)||0;
+    if(q*n>r.totNum){toast('⚠️ Total excede o numero de bilhetes!');return;}
+    qtds=r.partic.map(()=>q);
+  }
+
+  // Atribui quantidades e gera faixas sequenciais
+  let contador=1;
+  r.partic.forEach((p,i)=>{
+    const q=qtds[i]||0;
+    p.numeros=q;
+    if(q>0){
+      const ini=contador;
+      const fim=contador+q-1;
+      // Formata com zeros à esquerda baseado no total
+      const pad=String(r.totNum).length;
+      if(q===1){
+        p.faixas=String(ini).padStart(pad,'0');
+      } else {
+        p.faixas=String(ini).padStart(pad,'0')+'-'+String(fim).padStart(pad,'0');
+      }
+      contador+=q;
+    } else {
+      p.faixas='';
+    }
+  });
+
+  salvRifas();
+  renderNumRifa();
+  const total=qtds.reduce((a,b)=>a+b,0);
+  toast('✅ '+total+' numeros distribuidos! Abra cada participante para marcar os pagamentos.');
+}
+
+function limparDistrib(){
+  if(rifaNumIdx===null)return;
+  const r=RIFAS[rifaNumIdx];
+  cnf('Limpar distribuicao?','Todos os numeros serao zerados.',()=>{
+    r.partic.forEach(p=>{p.numeros=0;p.faixas='';});
+    salvRifas();renderNumRifa();toast('↩ Distribuicao limpa.');
+  });
+}
+
+/* ── Expande faixas em array de numeros individuais ── */
+function expandirFaixas(faixas, total){
+  // Ex: "01-10, 45, 67" → [1,2,3,...,10,45,67]
+  if(!faixas||faixas.trim()==='') return [];
+  const nums=[];
+  faixas.split(',').forEach(parte=>{
+    parte=parte.trim();
+    if(parte.includes('-')){
+      const [ini,fim]=parte.split('-').map(x=>parseInt(x.trim()));
+      if(!isNaN(ini)&&!isNaN(fim)){
+        for(let n=ini;n<=fim&&n<=total;n++) nums.push(n);
+      }
+    } else {
+      const n=parseInt(parte);
+      if(!isNaN(n)&&n>=1&&n<=total) nums.push(n);
+    }
+  });
+  return [...new Set(nums)].sort((a,b)=>a-b);
+}
+
+/* ── Garante que cada participante tenha array de bilhetes ── */
+function garantirBilhetes(r){
+  r.partic.forEach(p=>{
+    if(!p.bilhetes||p.bilhetes.length===0){
+      const nums=expandirFaixas(p.faixas, r.totNum);
+      if(nums.length>0){
+        p.bilhetes=nums.map(n=>({n,pago:false,dataPgto:null}));
+      } else if(p.numeros>0&&!p.faixas){
+        // sem faixas definidas — cria bilhetes genericos
+        p.bilhetes=Array.from({length:p.numeros},(_,i)=>({n:i+1,pago:false,dataPgto:null}));
+      } else {
+        p.bilhetes=[];
+      }
+    }
+    // Sincroniza: se faixas mudaram, regera bilhetes mantendo status dos já pagos
+    const nums=expandirFaixas(p.faixas, r.totNum);
+    if(nums.length>0&&nums.length!==p.bilhetes.length){
+      const pagosSet=new Set((p.bilhetes||[]).filter(b=>b.pago).map(b=>b.n));
+      p.bilhetes=nums.map(n=>({n,pago:pagosSet.has(n),dataPgto:pagosSet.has(n)?(p.bilhetes.find(b=>b.n===n)?.dataPgto||null):null}));
+    }
+  });
 }
 
 function renderNumRifa(){
   if(rifaNumIdx===null)return;
   const r=RIFAS[rifaNumIdx];
+  garantirBilhetes(r);
+
   const distrib=r.partic.reduce((a,p)=>a+p.numeros,0);
   const disp=r.totNum-distrib;
+  const totalBilh=r.partic.reduce((a,p)=>a+(p.bilhetes||[]).length,0);
+  const pagos=r.partic.reduce((a,p)=>a+(p.bilhetes||[]).filter(b=>b.pago).length,0);
+  const pendentes=totalBilh-pagos;
+  const arrecadPago=pagos*r.valNum;
+  const arrecadTotal=totalBilh*r.valNum;
+
   document.getElementById('rnDistrib').textContent=distrib;
   document.getElementById('rnTotal').textContent=r.totNum;
   document.getElementById('rnDisp').textContent=disp;
   document.getElementById('rnDisp').style.color=disp<0?'var(--vm)':disp===0?'var(--g)':'var(--am)';
+  const arn=document.getElementById('rnArrecad');
+  if(arn) arn.innerHTML=r.valNum>0
+    ?`<span style="color:var(--g);">💰 Pago: ${f(arrecadPago)}</span> <span style="color:var(--sub);">/ Previsto: ${f(arrecadTotal)}</span> <span style="color:var(--am);">· ${pendentes} pendente(s)</span>`
+    :'';
 
-  document.getElementById('rifaNumLista').innerHTML=r.partic.map((p,pi)=>`
-    <div style="background:var(--card2);border:1px solid var(--bo);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-      <div style="font-weight:700;font-size:.84rem;margin-bottom:7px;">${p.nome}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+  const pad=String(r.totNum).length;
+
+  document.getElementById('rifaNumLista').innerHTML=r.partic.map((p,pi)=>{
+    const bilhs=p.bilhetes||[];
+    const nPagos=bilhs.filter(b=>b.pago).length;
+    const nPend=bilhs.length-nPagos;
+    const valPago=nPagos*r.valNum;
+    const temFaixas=p.faixas&&p.faixas.trim();
+
+    return`<div style="background:var(--card2);border:1px solid ${nPagos>0?nPend===0?'rgba(0,200,83,.3)':'rgba(59,130,246,.25)':'var(--bo)'};border-radius:11px;padding:11px 12px;margin-bottom:9px;">
+      <!-- Cabeçalho do participante -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div>
-          <label style="font-size:.67rem;color:var(--sub);display:block;margin-bottom:2px;">Qtd. de numeros</label>
-          <input type="number" min="0" value="${p.numeros}" style="width:80px;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:.86rem;outline:none;font-family:inherit;"
+          <div style="font-weight:700;font-size:.85rem;">${p.nome}</div>
+          <div style="font-size:.7rem;color:var(--sub);margin-top:1px;">
+            ${bilhs.length>0
+              ?`<span style="color:var(--g);">${nPagos} pago${nPagos!==1?'s':''}</span>${nPend>0?` · <span style="color:var(--am);">${nPend} pendente${nPend!==1?'s':''}</span>`:' ✅'}${r.valNum>0?' · '+f(valPago):''}`
+              :`${p.numeros} num. — sem bilhetes gerados`}
+          </div>
+        </div>
+        ${bilhs.length>0?`<div style="display:flex;gap:5px;">
+          <button class="btn bv bsm" onclick="pagarTodosNum(${rifaNumIdx},${pi})" title="Marcar todos como pago" style="padding:4px 8px;font-size:.7rem;">✅ Todos</button>
+          <button class="btn bo2 bsm" onclick="despagarTodosNum(${rifaNumIdx},${pi})" title="Desmarcar todos" style="padding:4px 8px;font-size:.7rem;">↩</button>
+        </div>`:''}
+      </div>
+
+      <!-- Campos de configuração -->
+      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:flex-start;margin-bottom:${bilhs.length>0?'10px':'0'};">
+        <div>
+          <label style="font-size:.63rem;color:var(--sub);display:block;margin-bottom:2px;">Qtd.</label>
+          <input type="number" min="0" value="${p.numeros}"
+            style="width:60px;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:5px 6px;color:var(--tx);font-size:.84rem;outline:none;font-family:inherit;text-align:center;"
             oninput="RIFAS[${rifaNumIdx}].partic[${pi}].numeros=parseInt(this.value)||0;renderNumRifa();">
         </div>
-        <div style="flex:1;">
-          <label style="font-size:.67rem;color:var(--sub);display:block;margin-bottom:2px;">Faixas de numeros (ex: 01-10, 45)</label>
-          <input type="text" value="${p.faixas||''}" placeholder="ex: 01-10, 45, 67" style="width:100%;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:.82rem;outline:none;font-family:inherit;"
-            oninput="RIFAS[${rifaNumIdx}].partic[${pi}].faixas=this.value;">
+        <div style="flex:1;min-width:110px;">
+          <label style="font-size:.63rem;color:var(--sub);display:block;margin-bottom:2px;">Faixas (ex: 01-10, 45)</label>
+          <input type="text" value="${p.faixas||''}" placeholder="ex: 01-10, 45"
+            style="width:100%;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:5px 7px;color:${temFaixas?'var(--ac)':'var(--tx)'};font-size:.78rem;outline:none;font-family:inherit;"
+            onchange="RIFAS[${rifaNumIdx}].partic[${pi}].faixas=this.value;RIFAS[${rifaNumIdx}].partic[${pi}].bilhetes=[];garantirBilhetes(RIFAS[${rifaNumIdx}]);renderNumRifa();">
         </div>
       </div>
-      ${p.numeros>0&&r.valNum>0?`<div style="font-size:.72rem;color:var(--g);margin-top:5px;">💰 ${p.numeros} × ${f(r.valNum)} = ${f(p.numeros*r.valNum)}</div>`:''}
-    </div>`).join('');
+
+      <!-- Grid de bilhetes clicáveis -->
+      ${bilhs.length>0?`
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        ${bilhs.map((b,bi)=>`
+          <button onclick="toggleBilhete(${rifaNumIdx},${pi},${bi})"
+            title="${b.pago?'Pago em '+fD(b.dataPgto)+' — clique para desmarcar':'Clique para marcar como pago'}"
+            style="
+              min-width:36px;padding:4px 5px;border-radius:6px;border:1px solid;
+              font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit;
+              background:${b.pago?'rgba(0,200,83,.15)':'var(--bg2)'};
+              border-color:${b.pago?'rgba(0,200,83,.4)':'var(--bo)'};
+              color:${b.pago?'var(--g)':'var(--sub)'};
+              transition:.15s;
+            ">
+            ${String(b.n).padStart(pad,'0')}${b.pago?'✓':''}
+          </button>`).join('')}
+      </div>`
+      :`<div style="font-size:.73rem;color:var(--sub);">Informe as faixas acima para gerar os bilhetes.</div>`}
+    </div>`;
+  }).join('');
+}
+
+function toggleBilhete(ri,pi,bi){
+  const r=RIFAS[ri];
+  const b=r.partic[pi].bilhetes[bi];
+  b.pago=!b.pago;
+  b.dataPgto=b.pago?new Date().toISOString().split('T')[0]:null;
+  salvRifas();
+  renderNumRifa();
+  const nome=r.partic[pi].nome.split(' ')[0];
+  toast(b.pago?`✅ Nº ${String(b.n).padStart(2,'0')} — ${nome} pago!`:`↩ Nº ${String(b.n).padStart(2,'0')} — ${nome} desmarcado`);
+}
+
+function pagarTodosNum(ri,pi){
+  const hoje=new Date().toISOString().split('T')[0];
+  RIFAS[ri].partic[pi].bilhetes.forEach(b=>{b.pago=true;b.dataPgto=hoje;});
+  salvRifas();renderNumRifa();
+  toast('✅ Todos os numeros de '+RIFAS[ri].partic[pi].nome.split(' ')[0]+' marcados como pagos!');
+}
+
+function despagarTodosNum(ri,pi){
+  RIFAS[ri].partic[pi].bilhetes.forEach(b=>{b.pago=false;b.dataPgto=null;});
+  salvRifas();renderNumRifa();
+  toast('↩ Numeros de '+RIFAS[ri].partic[pi].nome.split(' ')[0]+' desmarcados.');
 }
 
 function salvarNumRifa(){
