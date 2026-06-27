@@ -1158,20 +1158,35 @@ function gerarProximoCiclo(emp){
 }
 
 function garantirCiclosAteHoje(emp){
-  // Garante que todos os ciclos ate hoje estejam criados
+  // Cria ciclos somente para datas que JA venceram ou vencem hoje
+  // Ciclos futuros NAO sao criados ate o vencimento chegar
   const hoje=new Date(); hoje.setHours(23,59,59,0);
   let limite=0;
-  while(limite<24){
+  while(limite<36){
     const ult=emp.ciclos[emp.ciclos.length-1];
-    if(new Date(ult.venc+'T12:00:00')<=hoje && !ult.pago){
+    const vultDate=new Date(ult.venc+'T12:00:00');
+    // So cria proximo ciclo se o ultimo JA venceu E foi pago
+    if(ult.pago && vultDate<=hoje){
       gerarProximoCiclo(emp);
-    } else break;
+    } else {
+      break;
+    }
     limite++;
   }
 }
 
+function ciclosVencidos(emp){
+  // Retorna apenas ciclos que JA venceram (data <= hoje) e nao foram pagos
+  const hoje=new Date(); hoje.setHours(23,59,59,0);
+  return emp.ciclos.filter(c=>{
+    const dv=new Date(c.venc+'T12:00:00');
+    return !c.pago && dv<=hoje;
+  });
+}
+
 function ciclosEmAberto(emp){
   garantirCiclosAteHoje(emp);
+  // Retorna ciclos nao pagos — inclui o proximo a vencer (nao atrasado)
   return emp.ciclos.filter(c=>!c.pago);
 }
 
@@ -1237,41 +1252,49 @@ function renderEmp(){
   const hoje=new Date();hoje.setHours(23,59,59,0);
   el.innerHTML=EMPS.map((e,i)=>{
     garantirCiclosAteHoje(e);
-    const caberto=ciclosEmAberto(e);
-    const tJ=totalJurosCiclos(caberto);
+    const vencidos=ciclosVencidos(e);
+    const proxFut=e.ciclos.filter(c=>!c.pago&&new Date(c.venc+'T12:00:00')>hoje);
+    const prox=proxFut[0]||null;
+    const proxDiff=prox?Math.ceil((new Date(prox.venc+'T12:00:00')-hoje)/86400000):null;
+    const tJVenc=totalJurosCiclos(vencidos);
     const s=e.saldoDevedor;
-    const prox=caberto[0];
-    const proxVenc=prox?new Date(prox.venc+'T12:00:00'):null;
-    const diffProx=proxVenc?Math.ceil((proxVenc-hoje)/86400000):null;
-    const atras=caberto.filter(c=>new Date(c.venc+'T12:00:00')<=hoje);
-    const cor=e.quitado?'var(--g)':atras.length>0?'var(--vm)':'var(--am)';
-    const sit=e.quitado?'✅ Quitado':atras.length>0?'🔴 '+atras.length+' ciclo(s) atrasado(s)':diffProx!==null?'🟡 Vence em '+diffProx+'d':'🟢 Em dia';
     const tPago=(e.pagamentos||[]).reduce((a,p)=>a+p.total,0);
-    return`<div class="emp-card" id="ec${e.id}">
+    const cor=e.quitado?'var(--g)':vencidos.length>0?'var(--vm)':prox?'var(--am)':'var(--g)';
+    const sit=e.quitado?'✅ Quitado':vencidos.length>0?'🔴 '+vencidos.length+' atrasado(s)':prox?'🟡 Vence em '+proxDiff+'d':'🟢 Em dia';
+    return`<div class="emp-card">
       <div class="emp-nm">💳 ${e.tomador}${e.responsavel?` <span style="font-size:.7rem;color:var(--sub);font-weight:400;">(resp: ${e.responsavel})</span>`:''}
         <span class="st" style="margin-left:auto;color:${cor};background:${cor}18;border:1px solid ${cor}30;font-size:.65rem;">${sit}</span>
       </div>
       <div class="er2"><span class="el">Principal original</span><span class="erv">${f(e.valor)}</span></div>
       <div class="er2"><span class="el">Taxa de juros</span><span class="erv" style="color:var(--am);">${e.taxa}% ao mes</span></div>
       <div class="er2"><span class="el">💰 Saldo devedor</span><span class="erv" style="color:var(--g);font-size:.9rem;">${f(s)}</span></div>
-      <div class="er2"><span class="el">Ciclos em aberto</span><span class="erv" style="color:${atras.length>0?'var(--vm)':'var(--sub)'};">${caberto.length} ciclo(s)</span></div>
-      <div class="er2"><span class="el">Juros acumulados</span><span class="erv" style="color:var(--am);">${f(tJ)}</span></div>
+      ${vencidos.length>0?`<div class="er2"><span class="el">🔴 Juros atrasados</span><span class="erv" style="color:var(--vm);">${f(tJVenc)} (${vencidos.length} ciclo${vencidos.length>1?'s':''})</span></div>`:''}
+      ${prox?`<div class="er2"><span class="el">⏰ Proximo vencimento</span><span class="erv" style="color:var(--am);">${fD(prox.venc)} — ${f(prox.juros)}</span></div>`:''}
       ${tPago>0?`<div class="er2"><span class="el">Total ja pago</span><span class="erv" style="color:var(--ac);">${f(tPago)}</span></div>`:''}
       ${e.dataEmprestimo?`<div class="er2"><span class="el">Data</span><span class="erv" style="color:var(--sub);">${fD(e.dataEmprestimo)}</span></div>`:''}
       ${e.obs?`<div class="er2"><span class="el">Obs.</span><span class="erv" style="color:var(--sub);font-size:.72rem;">${e.obs}</span></div>`:''}
 
-      ${caberto.length>0?`
+      ${vencidos.length>0?`
       <div style="margin-top:9px;">
-        <div style="font-size:.66rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ciclos de juros</div>
-        ${caberto.map((c,ci)=>{
-          const cv=new Date(c.venc+'T12:00:00');
-          const da=Math.ceil((cv-hoje)/86400000);
-          const vAtr=da<0;
-          return`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(30,42,64,.4);font-size:.77rem;">
-            <span style="color:${vAtr?'var(--vm)':'var(--sub)'};">${vAtr?'🔴':'⏰'} ${fD(c.venc)} ${vAtr?'('+Math.abs(da)+'d atraso)':'('+da+'d)'}</span>
-            <span style="color:var(--am);font-weight:600;">${f(c.juros)}</span>
+        <div style="font-size:.66rem;font-weight:700;color:var(--vm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">⚠️ Ciclos atrasados</div>
+        ${vencidos.map(c=>{
+          const da=Math.ceil((new Date(c.venc+'T12:00:00')-hoje)/86400000);
+          return`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;margin-bottom:3px;background:rgba(255,61,0,.07);border:1px solid rgba(255,61,0,.2);border-radius:8px;font-size:.77rem;">
+            <div><div style="font-weight:600;color:var(--vm);">Venc. ${fD(c.venc)}</div>
+            <div style="font-size:.67rem;color:var(--sub);">Atrasado ${Math.abs(da)} dia(s)</div></div>
+            <span style="color:var(--vm);font-weight:700;">${f(c.juros)}</span>
           </div>`;
         }).join('')}
+      </div>`:''}
+
+      ${prox&&!e.quitado?`
+      <div style="margin-top:8px;">
+        <div style="font-size:.66rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">📅 Proximo vencimento (ainda nao cobrado)</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.15);border-radius:8px;font-size:.77rem;">
+          <div><div style="font-weight:600;color:var(--am);">${fD(prox.venc)} — em ${proxDiff}d</div>
+          <div style="font-size:.67rem;color:var(--sub);">Juros sobre ${f(s)}: ${f(prox.juros)}</div></div>
+          <span style="color:var(--am);font-weight:700;">${f(prox.juros)}</span>
+        </div>
       </div>`:''}
 
       ${(e.pagamentos||[]).length?`
@@ -1287,10 +1310,7 @@ function renderEmp(){
       </div>`:''}
 
       <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;">
-        ${!e.quitado?`
-          <button class="btn bw bsm" onclick="abrirPgto(${i})">💵 Lancar pgto</button>
-          <button class="btn bv bsm" onclick="quitarE(${i})">✅ Quitar</button>
-        `:''}
+        ${!e.quitado?`<button class="btn bw bsm" onclick="abrirPgto(${i})">💵 Lancar pgto</button><button class="btn bv bsm" onclick="quitarE(${i})">✅ Quitar</button>`:''}
         <button class="btn bw bsm" onclick="cobrarEmp(${i})">📲 Cobrar</button>
         <button class="btn bd bsm" onclick="delE(${i})">🗑</button>
       </div>
@@ -1299,44 +1319,52 @@ function renderEmp(){
 }
 
 /* ── Modal Pagamento — Logica Caderneta ── */
+/*
+  REGRAS:
+  - Pagamento opera APENAS sobre ciclos JA VENCIDOS (atrasados)
+  - Ciclos futuros nao sao cobrados ainda
+  - Modo "so juros": quita os juros dos ciclos vencidos, principal NAO muda
+  - Modo "juros + abate": quita juros dos vencidos, EXCEDENTE abate principal
+  - Modo "quitacao": quita tudo (juros vencidos + principal)
+  - Apos cada pagamento, gera o proximo ciclo com juros sobre o NOVO saldo
+*/
+
 function abrirPgto(i){
   pgtoIdx=i;
   const e=EMPS[i];
   garantirCiclosAteHoje(e);
-  const caberto=ciclosEmAberto(e);
-  const tJ=totalJurosCiclos(caberto);
+  const vencidos=ciclosVencidos(e);
+  const tJVenc=totalJurosCiclos(vencidos);
   const s=e.saldoDevedor;
+  const hoje=new Date();hoje.setHours(23,59,59,0);
 
   // Resumo
   document.getElementById('pgtoResumo').innerHTML=`
     <div style="font-weight:700;font-size:.88rem;margin-bottom:7px;">${e.tomador}</div>
     <div class="cr"><span style="color:var(--sub)">Saldo devedor (principal)</span><span style="color:var(--g);font-weight:700;">${f(s)}</span></div>
     <div class="cr"><span style="color:var(--sub)">Taxa de juros</span><span style="color:var(--am);">${e.taxa}% ao mes</span></div>
-    <div class="cr"><span style="color:var(--sub)">Ciclos em aberto</span><span style="color:var(--vm);font-weight:700;">${caberto.length} ciclo(s) — ${f(tJ)} total</span></div>
+    <div class="cr"><span style="color:var(--sub)">Ciclos vencidos em atraso</span><span style="color:${vencidos.length>0?'var(--vm)':'var(--g)'};font-weight:700;">${vencidos.length>0?vencidos.length+' ciclo(s) — '+f(tJVenc):'Nenhum em atraso'}</span></div>
     <div style="font-size:.7rem;color:var(--sub);border-top:1px solid var(--bo);padding-top:6px;margin-top:4px;">
-      💡 Os juros de cada ciclo sao calculados sobre o saldo do mes correspondente.
-      Pagar os juros NAO abate o principal.
+      💡 So ciclos JA vencidos entram no pagamento. Juros NAO abate o principal.
     </div>`;
 
-  // Lista de ciclos
-  const hoje=new Date();hoje.setHours(23,59,59,0);
-  document.getElementById('pgtoCiclos').innerHTML=caberto.length===0
-    ? '<div style="color:var(--g);font-size:.8rem;">✅ Nenhum ciclo em aberto.</div>'
-    : caberto.map((c,ci)=>{
+  // Lista de ciclos vencidos
+  document.getElementById('pgtoCiclos').innerHTML=vencidos.length===0
+    ? '<div style="color:var(--g);font-size:.8rem;padding:6px 0;">✅ Nenhum ciclo vencido em atraso.</div>'
+    : vencidos.map(c=>{
         const da=Math.ceil((new Date(c.venc+'T12:00:00')-hoje)/86400000);
-        const vAtr=da<0;
-        return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:4px;background:${vAtr?'rgba(255,61,0,.07)':'rgba(30,42,64,.3)'};border:1px solid ${vAtr?'rgba(255,61,0,.2)':'var(--bo)'};border-radius:8px;font-size:.78rem;">
+        return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:4px;background:rgba(255,61,0,.07);border:1px solid rgba(255,61,0,.2);border-radius:8px;font-size:.78rem;">
           <div>
-            <div style="font-weight:600;color:${vAtr?'var(--vm)':'var(--tx)'};">Ciclo ${ci+1} — ${fD(c.venc)}</div>
-            <div style="font-size:.68rem;color:var(--sub);">${vAtr?'Atrasado '+Math.abs(da)+'d':'Vence em '+da+'d'} · juros s/ saldo: ${f(c.juros)}</div>
+            <div style="font-weight:600;color:var(--vm);">Venc. ${fD(c.venc)} — atrasado ${Math.abs(da)}d</div>
+            <div style="font-size:.68rem;color:var(--sub);">Juros sobre ${f(s)}: ${f(c.juros)}</div>
           </div>
-          <span style="color:var(--am);font-weight:700;">${f(c.juros)}</span>
+          <span style="color:var(--vm);font-weight:700;">${f(c.juros)}</span>
         </div>`;
       }).join('');
 
   // Reset campos
   document.getElementById('pgtoVal').value='';
-  document.getElementById('pgtoModo').value='juros';
+  document.getElementById('pgtoModo').value=vencidos.length>0?'juros':'juros_abate';
   document.getElementById('pbAbateRow').style.display='none';
   document.getElementById('pgtoAv').innerHTML='';
   calcPgto();
@@ -1346,51 +1374,58 @@ function abrirPgto(i){
 function calcPgto(){
   if(pgtoIdx===null)return;
   const e=EMPS[pgtoIdx];
-  const caberto=ciclosEmAberto(e);
-  const tJ=totalJurosCiclos(caberto);
+  const vencidos=ciclosVencidos(e);
+  const tJVenc=totalJurosCiclos(vencidos);
   const s=e.saldoDevedor;
   const modo=document.getElementById('pgtoModo').value;
   const pgtoValGrp=document.getElementById('pgtoValGrp');
   const av=document.getElementById('pgtoAv');
 
   if(modo==='quitacao'){
-    // Quitacao: paga todos os juros em aberto + saldo total
-    const total=+(tJ+s).toFixed(2);
+    const total=+(tJVenc+s).toFixed(2);
     document.getElementById('pgtoVal').value=total.toLocaleString('pt-BR',{minimumFractionDigits:2});
     pgtoValGrp.style.display='none';
-    document.getElementById('pbJuros').textContent=f(tJ);
+    document.getElementById('pbJuros').textContent=f(tJVenc);
     document.getElementById('pbAbate').textContent=f(s);
     document.getElementById('pbSaldo').textContent=f(0);
     document.getElementById('pbAbateRow').style.display='flex';
     av.innerHTML='<span style="color:var(--g)">🎉 Quitacao total: '+f(total)+'</span>';
     return;
   }
+
   pgtoValGrp.style.display='block';
   const pg=lerM('pgtoVal');
 
   if(modo==='juros'){
-    // So juros: paga os juros acumulados, NAO toca no principal
-    document.getElementById('pgtoValLbl').textContent='Valor pago (juros acumulados = '+f(tJ)+')';
-    document.getElementById('pbJuros').textContent=f(Math.min(pg,tJ));
+    // Paga so os juros dos ciclos vencidos — principal nao muda
+    document.getElementById('pgtoValLbl').textContent=
+      vencidos.length>0
+        ? 'Valor dos juros vencidos = '+f(tJVenc)
+        : 'Nenhum ciclo vencido em atraso';
+    document.getElementById('pbJuros').textContent=f(Math.min(pg,tJVenc));
     document.getElementById('pbAbateRow').style.display='none';
-    document.getElementById('pbSaldo').textContent=f(s); // principal nao muda
+    document.getElementById('pbSaldo').textContent=f(s);
     if(pg<=0)av.innerHTML='';
-    else if(pg<tJ)av.innerHTML='<span style="color:var(--am)">⚠️ Pagamento parcial de juros. '+caberto.length+' ciclo(s) ainda em aberto.</span>';
-    else if(+(pg.toFixed(2))>=+tJ.toFixed(2))av.innerHTML='<span style="color:var(--g)">✅ Cobre todos os juros em aberto. Principal permanece: '+f(s)+'</span>';
+    else if(tJVenc===0)av.innerHTML='<span style="color:var(--g)">✅ Nenhum juros vencido em atraso!</span>';
+    else if(pg<tJVenc)av.innerHTML='<span style="color:var(--am)">⚠️ Pagamento parcial de juros. Saldo permanece: '+f(s)+'</span>';
+    else av.innerHTML='<span style="color:var(--g)">✅ Cobre todos os juros vencidos. Saldo permanece: '+f(s)+'</span>';
+
   } else if(modo==='juros_abate'){
-    // Juros + abate: paga juros primeiro, excedente abate o principal
-    document.getElementById('pgtoValLbl').textContent='Valor total pago';
+    // Paga os juros vencidos + abate o excedente no principal
+    document.getElementById('pgtoValLbl').textContent='Valor total pago (juros + abate)';
     document.getElementById('pbAbateRow').style.display='flex';
-    const jurosP=Math.min(pg,tJ);
-    const abate=Math.max(0,+(pg-tJ).toFixed(2));
-    const novoS=Math.max(0,+(s-abate).toFixed(2));
+    // Juros pagos = min(pago, juros vencidos)
+    const jurosP=+Math.min(pg,tJVenc).toFixed(2);
+    // Abate = o que sobrar alem dos juros
+    const abate=+Math.max(0,pg-tJVenc).toFixed(2);
+    const novoS=+Math.max(0,s-abate).toFixed(2);
     document.getElementById('pbJuros').textContent=f(jurosP);
     document.getElementById('pbAbate').textContent=f(abate);
     document.getElementById('pbSaldo').textContent=f(novoS);
     if(pg<=0)av.innerHTML='';
-    else if(pg<tJ)av.innerHTML='<span style="color:var(--am)">⚠️ Nao cobre todos os juros. Abate no principal = R$ 0,00.</span>';
+    else if(pg<=tJVenc)av.innerHTML='<span style="color:var(--am)">⚠️ Cobre so os juros (abate = R$ 0,00). Para abater, pague acima de '+f(tJVenc)+'</span>';
     else if(novoS===0)av.innerHTML='<span style="color:var(--g)">🎉 Quita o emprestimo!</span>';
-    else av.innerHTML='<span style="color:var(--g)">✅ Abate '+f(abate)+' do principal. Novo saldo: '+f(novoS)+'</span>';
+    else av.innerHTML='<span style="color:var(--g)">✅ Juros: '+f(jurosP)+' | Abate: '+f(abate)+' | Novo saldo: '+f(novoS)+'</span>';
   }
 }
 
@@ -1398,61 +1433,64 @@ function confirmarPgto(){
   if(pgtoIdx===null)return;
   const e=EMPS[pgtoIdx];
   garantirCiclosAteHoje(e);
-  const caberto=ciclosEmAberto(e);
-  const tJ=totalJurosCiclos(caberto);
+  const vencidos=ciclosVencidos(e);
+  const tJVenc=totalJurosCiclos(vencidos);
   const s=e.saldoDevedor;
   const modo=document.getElementById('pgtoModo').value;
   const pg=lerM('pgtoVal');
+  const hoje=new Date().toISOString().split('T')[0];
 
-  if(caberto.length===0){toast('✅ Nenhum ciclo em aberto!');return;}
-
-  let jurosP=0,abate=0,novoS=s,total=pg;
+  let jurosP=0, abate=0, novoS=s, total=pg;
 
   if(modo==='quitacao'){
-    jurosP=tJ; abate=s; novoS=0; total=+(tJ+s).toFixed(2);
-    // Marca todos os ciclos como pagos
-    caberto.forEach(c=>{c.pago=true;c.dataPgto=new Date().toISOString().split('T')[0];c.valorPago=c.juros;});
+    jurosP=tJVenc; abate=s; novoS=0; total=+(tJVenc+s).toFixed(2);
+    vencidos.forEach(c=>{c.pago=true;c.dataPgto=hoje;c.valorPago=c.juros;});
     e.saldoDevedor=0; e.quitado=true;
+
   } else if(modo==='juros'){
     if(pg<=0){toast('⚠️ Informe o valor!');return;}
-    jurosP=Math.min(pg,tJ); abate=0; novoS=s;
-    // Marca ciclos pagos proporcional ao valor
+    if(vencidos.length===0){toast('✅ Nenhum ciclo vencido em atraso!');return;}
+    jurosP=+Math.min(pg,tJVenc).toFixed(2);
+    abate=0; novoS=s;
+    // Quita ciclos vencidos na ordem (mais antigo primeiro)
     let restante=pg;
-    for(const c of caberto){
+    for(const c of vencidos){
       if(restante<=0)break;
-      if(restante>=c.juros){c.pago=true;c.dataPgto=new Date().toISOString().split('T')[0];c.valorPago=c.juros;restante=+(restante-c.juros).toFixed(2);}
-      else{c.valorPago=+(c.valorPago+restante).toFixed(2);restante=0;break;}
+      if(restante>=c.juros){
+        c.pago=true; c.dataPgto=hoje; c.valorPago=c.juros;
+        restante=+(restante-c.juros).toFixed(2);
+      } else {
+        c.valorPago=+(c.valorPago+restante).toFixed(2);
+        restante=0;
+      }
     }
-    // Gera proximo ciclo com juros sobre MESMO saldo (principal nao mudou)
+    // Saldo nao mudou — gera proximo ciclo com mesmo saldo
     if(!e.quitado) gerarProximoCiclo(e);
+
   } else if(modo==='juros_abate'){
     if(pg<=0){toast('⚠️ Informe o valor!');return;}
-    jurosP=Math.min(pg,tJ);
-    abate=Math.max(0,+(pg-tJ).toFixed(2));
-    novoS=Math.max(0,+(s-abate).toFixed(2));
-    // Marca todos os ciclos como pagos (se cobre os juros)
-    if(pg>=tJ){
-      caberto.forEach(c=>{c.pago=true;c.dataPgto=new Date().toISOString().split('T')[0];c.valorPago=c.juros;});
-    } else {
-      let restante=pg;
-      for(const c of caberto){if(restante<=0)break;if(restante>=c.juros){c.pago=true;c.dataPgto=new Date().toISOString().split('T')[0];c.valorPago=c.juros;restante=+(restante-c.juros).toFixed(2);}else break;}
-    }
+    jurosP=+Math.min(pg,tJVenc).toFixed(2);
+    abate=+Math.max(0,pg-tJVenc).toFixed(2);
+    novoS=+Math.max(0,s-abate).toFixed(2);
+    // Quita todos os ciclos vencidos
+    vencidos.forEach(c=>{c.pago=true;c.dataPgto=hoje;c.valorPago=c.juros;});
     e.saldoDevedor=novoS;
-    if(novoS===0)e.quitado=true;
-    // Proximo ciclo com juros sobre NOVO saldo
+    if(novoS===0) e.quitado=true;
+    // Proximo ciclo com juros sobre NOVO saldo (apos abate)
     if(!e.quitado) gerarProximoCiclo(e);
   }
 
   e.pagamentos.push({
-    data:new Date().toISOString().split('T')[0],
-    modo, total:+total.toFixed(2), juros:+jurosP.toFixed(2),
-    abate:+abate.toFixed(2), saldoApos:novoS,
-    ciclosPagos:caberto.filter(c=>c.pago).length
+    data:hoje, modo, total:+total.toFixed(2),
+    juros:+jurosP.toFixed(2), abate:+abate.toFixed(2),
+    saldoApos:novoS,
+    ciclosPagos:vencidos.filter(c=>c.pago).length
   });
 
-  salv();fm('mPgto');renderEmp();kpis();alertas();renderAgenda();
+  salv(); fm('mPgto'); renderEmp(); kpis(); alertas(); renderAgenda();
   toast(e.quitado?'✅ Emprestimo quitado!':'💵 Lancado! Saldo: '+f(novoS));
 }
+
 
 function quitarE(i){
   cnf('Quitar emprestimo?',EMPS[i].tomador+' — saldo '+f(EMPS[i].saldoDevedor),()=>{
