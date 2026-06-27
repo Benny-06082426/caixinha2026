@@ -347,10 +347,50 @@ select.fc option{background:var(--bg2);}
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;">
     <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:12px;">
-      <div class="dlb">Juros a Receber</div><div class="dvl vm" id="dJuros" style="font-size:1.05rem;">—</div><div class="dsb">20% s/ saldo</div>
+      <div class="dlb">Juros a Receber</div><div class="dvl vm" id="dJuros" style="font-size:1.05rem;">—</div><div class="dsb">ciclos vencidos</div>
     </div>
     <div style="background:var(--card);border:1px solid var(--bo);border-radius:13px;padding:12px;">
       <div class="dlb">Total Previsto</div><div class="dvl vd" id="dPrev" style="font-size:1.05rem;">—</div><div class="dsb">saldo+juros+pend.</div>
+    </div>
+  </div>
+  <!-- Card de rendimento de juros — destaque especial -->
+  <div style="background:linear-gradient(135deg,rgba(0,200,83,.1),rgba(59,130,246,.07));border:1px solid rgba(0,200,83,.25);border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+    <div style="font-size:.62rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">💹 Rendimento de Juros — Total Recebido</div>
+    <div style="font-family:Syne,sans-serif;font-size:1.5rem;font-weight:800;color:var(--g);" id="dJurosReceb">—</div>
+    <div style="font-size:.72rem;color:var(--sub);margin-top:3px;" id="dJurosRecebSb">soma de todos os juros ja pagos</div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.62rem;color:var(--sub);margin-bottom:2px;">Juros pagos</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--g);font-size:.85rem;" id="dJPagos">—</div>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.62rem;color:var(--sub);margin-bottom:2px;">Ainda a receber</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--am);font-size:.85rem;" id="dJPendentes">—</div>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.62rem;color:var(--sub);margin-bottom:2px;">Emp. quitados</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--ac);font-size:.85rem;" id="dEmpQuit">—</div>
+      </div>
+    </div>
+  </div>
+  <!-- Card rendimento juros -->
+  <div style="background:linear-gradient(135deg,rgba(0,200,83,.1),rgba(59,130,246,.07));border:1px solid rgba(0,200,83,.25);border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+    <div style="font-size:.62rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;">💹 Rendimento de Juros — Total Recebido</div>
+    <div style="font-family:Syne,sans-serif;font-size:1.45rem;font-weight:800;color:var(--g);" id="dJurosReceb">—</div>
+    <div style="font-size:.72rem;color:var(--sub);margin-top:3px;">soma de todos os juros ja pagos (historico completo)</div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.6rem;color:var(--sub);margin-bottom:2px;">Juros recebidos</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--g);font-size:.82rem;" id="dJPagos">—</div>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.6rem;color:var(--sub);margin-bottom:2px;">Juros em atraso</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--am);font-size:.82rem;" id="dJPendentes">—</div>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:9px;padding:8px;text-align:center;">
+        <div style="font-size:.6rem;color:var(--sub);margin-bottom:2px;">Emp. quitados</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--ac);font-size:.82rem;" id="dEmpQuit">—</div>
+      </div>
     </div>
   </div>
   <div class="mini3">
@@ -473,6 +513,16 @@ select.fc option{background:var(--bg2);}
       <button class="btn bo2" style="width:100%;justify-content:center;padding:10px;" onclick="abrirTrocarSenha()">🔑 Trocar minha senha</button>
     </div>
   </div>
+</section>
+
+
+<!-- RIFA -->
+<section id="sRifa" class="sec">
+  <div class="stit">
+    <span>🎟️ Rifas</span>
+    <button class="btn bv bsm" onclick="novaRifa()">+ Nova Rifa</button>
+  </div>
+  <div id="listaRifas"></div>
 </section>
 
 </main>
@@ -628,10 +678,72 @@ select.fc option{background:var(--bg2);}
   <div class="modal" style="padding-bottom:20px;">
     <div class="mdrag"></div>
     <div class="mt">Menu <button class="xb" onclick="fm('mMais')">✕</button></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
       <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 6px;" onclick="fm('mMais');ir('sRel',null)"><span style="font-size:1.2rem;">📋</span>Relatorio</button>
       <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 6px;" onclick="fm('mMais');ir('sHist',null)"><span style="font-size:1.2rem;">🕒</span>Historico</button>
+      <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 6px;" onclick="fm('mMais');ir('sRifa',null)"><span style="font-size:1.2rem;">🎟️</span>Rifas</button>
       <button class="wbtn" style="flex-direction:column;gap:5px;padding:14px 6px;" onclick="fm('mMais');ir('sConf',null)"><span style="font-size:1.2rem;">⚙️</span>Config.</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RIFA -->
+<div class="ov" id="mRifa">
+  <div class="modal">
+    <div class="mdrag"></div>
+    <div class="mt" id="mRifaTit">🎟️ Nova Rifa <button class="xb" onclick="fm('mRifa')">✕</button></div>
+    <div class="fg"><label class="fl">Nome da Rifa</label>
+      <input class="fc" id="rifaNome" placeholder="Ex: Rifa Festa Junina 2026" maxlength="60">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="fg"><label class="fl">Data do sorteio</label>
+        <input class="fc" type="date" id="rifaData">
+      </div>
+      <div class="fg"><label class="fl">Valor por numero (R$)</label>
+        <div class="mw"><span class="mp">R$</span>
+          <input class="fc mi" type="text" id="rifaValNum" placeholder="0,00" oninput="fmtM(this);calcRifa();" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="fg"><label class="fl">Total de numeros</label>
+        <input class="fc" type="number" id="rifaTotalNum" value="100" min="1" max="10000" oninput="calcRifa()">
+      </div>
+      <div class="fg"><label class="fl">Premio (R$)</label>
+        <div class="mw"><span class="mp">R$</span>
+          <input class="fc mi" type="text" id="rifaPremio" placeholder="0,00" oninput="fmtM(this);" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+    <div class="cbox">
+      <div class="cr"><span style="color:var(--sub)">Total de numeros</span><span id="rcTotal">100</span></div>
+      <div class="cr"><span style="color:var(--sub)">Arrecadacao prevista</span><span style="color:var(--g)" id="rcArrecad">R$ 0,00</span></div>
+    </div>
+    <div class="fg"><label class="fl">Observacao (opcional)</label>
+      <input class="fc" id="rifaObs" placeholder="Ex: premio especial, regras...">
+    </div>
+    <div style="display:flex;gap:7px;margin-top:11px;">
+      <button class="btn bv" style="flex:1;" onclick="salvarRifa()">🎟️ Criar Rifa</button>
+      <button class="btn bo2" onclick="fm('mRifa')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR NUMEROS RIFA -->
+<div class="ov" id="mRifaNum">
+  <div class="modal">
+    <div class="mdrag"></div>
+    <div class="mt" id="mRifaNumTit">📋 Numeros da Rifa <button class="xb" onclick="fm('mRifaNum')">✕</button></div>
+    <div class="ibox">Edite a quantidade de numeros de cada participante. O total sera atualizado automaticamente.</div>
+    <div id="rifaNumLista"></div>
+    <div class="cbox" style="margin-top:10px;">
+      <div class="cr"><span style="color:var(--sub)">Numeros distribuidos</span><span id="rnDistrib" style="color:var(--g);">0</span></div>
+      <div class="cr"><span style="color:var(--sub)">Total da rifa</span><span id="rnTotal">0</span></div>
+      <div class="cr tot"><span>Disponíveis</span><span id="rnDisp" style="color:var(--am);">0</span></div>
+    </div>
+    <div style="display:flex;gap:7px;margin-top:11px;">
+      <button class="btn bv" style="flex:1;" onclick="salvarNumRifa()">💾 Salvar</button>
+      <button class="btn bo2" onclick="fm('mRifaNum')">Fechar</button>
     </div>
   </div>
 </div>
@@ -905,6 +1017,7 @@ function restaurarSessao(){
 /* ── Iniciar App ── */
 function iniciarApp(){
   load();
+  loadRifas();
   popularSelRel();
   document.getElementById('selRelP').addEventListener('change',gerarInd);
   carregarPixUI();
@@ -938,6 +1051,7 @@ function ir(id,btn){
   if(id==='sHist')renderHistBtns();
   if(id==='sConf')renderConf();
   if(id==='sAgenda'){agendaMesVis=new Date().getMonth();agendaAnoVis=new Date().getFullYear();renderAgenda();}
+  if(id==='sRifa'){renderRifas();}
   if(id==='sRel'){gerarGeral();popularSelRel();gerarInd();}
 }
 
@@ -1246,11 +1360,25 @@ function salvarEmp(){
 }
 
 /* ── Render Emprestimos ── */
+let mostrarQuit=false; // toggle para mostrar/ocultar quitados
+function toggleQuit(){mostrarQuit=!mostrarQuit;renderEmp();}
+
 function renderEmp(){
   const el=document.getElementById('listaEmp');
   if(!EMPS.length){el.innerHTML='<div style="color:var(--sub);padding:14px;text-align:center;font-size:.82rem;">Nenhum emprestimo registrado.</div>';return;}
   const hoje=new Date();hoje.setHours(23,59,59,0);
-  el.innerHTML=EMPS.map((e,i)=>{
+  const ativos=EMPS.filter(e=>!e.quitado);
+  const quitados=EMPS.filter(e=>e.quitado);
+  const lista=mostrarQuit?EMPS:ativos;
+  // Header com toggle de quitados
+  let quitHeader='';
+  if(quitados.length>0){
+    quitHeader=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:.75rem;color:var(--sub);">${ativos.length} ativo(s) · ${quitados.length} quitado(s)</span>
+      <button class="btn bo2 bsm" onclick="toggleQuit()">${mostrarQuit?'⬆️ Ocultar quitados':'⬇️ Ver quitados ('+quitados.length+')'}</button>
+    </div>`;
+  }
+  el.innerHTML=quitHeader+lista.map((e)=>{const i=EMPS.indexOf(e);
     garantirCiclosAteHoje(e);
     const vencidos=ciclosVencidos(e);
     const proxFut=e.ciclos.filter(c=>!c.pago&&new Date(c.venc+'T12:00:00')>hoje);
@@ -1680,8 +1808,17 @@ function renderDashboard(){
   const aT=PS.reduce((a,p)=>a+p.hist.reduce((b,v)=>b+(v?p.cotas*CVAL:0),0),0);
   const eA=EMPS.filter(e=>!e.quitado);
   const tE=eA.reduce((a,e)=>a+e.saldoDevedor,0);
-  const tJ=eA.reduce((a,e)=>{garantirCiclosAteHoje(e);return a+totalJurosCiclos(ciclosEmAberto(e));},0);
+  // Juros dos ciclos vencidos em atraso (a receber)
+  const tJ=eA.reduce((a,e)=>{garantirCiclosAteHoje(e);return a+totalJurosCiclos(ciclosVencidos(e));},0);
   const cP=pend.reduce((a,p)=>a+p.cotas*CVAL,0);
+  // Juros JA recebidos (historico de todos pagamentos de juros)
+  const jReceb=EMPS.reduce((a,e)=>a+(e.pagamentos||[]).reduce((b,p)=>b+p.juros,0),0);
+  // Juros pendentes (ciclos nao vencidos ainda - futuros)
+  const jPend=EMPS.filter(e=>!e.quitado).reduce((a,e)=>{
+    const fut=e.ciclos.filter(c=>!c.pago&&new Date(c.venc+'T12:00:00')>new Date());
+    return a+fut.reduce((b,c)=>b+c.juros,0);
+  },0);
+  const nQuit=EMPS.filter(e=>e.quitado).length;
   document.getElementById('dSaldo').textContent=f(aT-tE);
   document.getElementById('dArrMes').textContent=f(aM);document.getElementById('dArrMesSb').textContent=pg.length+' de '+PS.length+' pagaram';
   document.getElementById('dArrTotal').textContent=f(aT);
@@ -1690,6 +1827,11 @@ function renderDashboard(){
   document.getElementById('dReceber').textContent=f(tE+tJ);
   document.getElementById('dPrev').textContent=f(aM+tJ+cP);
   document.getElementById('dNPag').textContent=pg.length;document.getElementById('dNPend').textContent=pend.length;document.getElementById('dNEmp').textContent=eA.length;
+  // Rendimento de juros
+  document.getElementById('dJurosReceb').textContent=f(jReceb);
+  document.getElementById('dJPagos').textContent=f(jReceb);
+  document.getElementById('dJPendentes').textContent=f(tJ);
+  document.getElementById('dEmpQuit').textContent=nQuit;
   // Grafico
   const bH=68;let bHtml='';
   for(let i=0;i<12;i++){
@@ -1786,6 +1928,211 @@ function verificarAlertas(){
     const v=new Date(e.venc);v.setHours(0,0,0,0);const d=Math.ceil((v-h)/86400000);
     if(d===7)try{new Notification('Emprestimo - '+e.tomador,{body:'Vence em 7 dias ('+fD(e.venc)+'). Juros: '+f(calcJ(e.saldoDevedor||e.valor))});}catch(ex){}
     if(d<0)try{new Notification('Emprestimo atrasado - '+e.tomador,{body:'Atrasado '+Math.abs(d)+'d. Saldo: '+f(e.saldoDevedor||e.valor)});}catch(ex){}
+  });
+}
+
+/* ══ RIFAS ══ */
+let RIFAS=[];
+let rifaEditIdx=null;
+let rifaNumIdx=null;
+
+function loadRifas(){
+  try{const r=localStorage.getItem('gc_rf');if(r)RIFAS=JSON.parse(r);}catch(e){}
+}
+function salvRifas(){localStorage.setItem('gc_rf',JSON.stringify(RIFAS));}
+
+function calcRifa(){
+  const tot=parseInt(document.getElementById('rifaTotalNum').value)||0;
+  const val=lerM('rifaValNum');
+  document.getElementById('rcTotal').textContent=tot;
+  document.getElementById('rcArrecad').textContent=f(tot*val);
+}
+
+function novaRifa(){
+  rifaEditIdx=null;
+  document.getElementById('mRifaTit').innerHTML='🎟️ Nova Rifa <button class="xb" onclick="fm(\'mRifa\')">✕</button>';
+  document.getElementById('rifaNome').value='';
+  document.getElementById('rifaData').value='';
+  document.getElementById('rifaValNum').value='';
+  document.getElementById('rifaTotalNum').value='100';
+  document.getElementById('rifaPremio').value='';
+  document.getElementById('rifaObs').value='';
+  calcRifa();
+  am('mRifa');
+}
+
+function salvarRifa(){
+  const nome=document.getElementById('rifaNome').value.trim();
+  const data=document.getElementById('rifaData').value;
+  const valNum=lerM('rifaValNum');
+  const totNum=parseInt(document.getElementById('rifaTotalNum').value)||100;
+  const premio=lerM('rifaPremio');
+  const obs=document.getElementById('rifaObs').value;
+  if(!nome){toast('⚠️ Informe o nome da rifa!');return;}
+
+  if(rifaEditIdx!==null){
+    const r=RIFAS[rifaEditIdx];
+    r.nome=nome;r.data=data;r.valNum=valNum;r.totNum=totNum;r.premio=premio;r.obs=obs;
+    toast('✅ Rifa atualizada!');
+  } else {
+    // Cria participantes da rifa a partir de PS
+    const partic=PS.map(p=>({id:p.id,nome:p.nome,numeros:0,faixas:''}));
+    RIFAS.push({
+      id:Date.now(),nome,data,valNum,totNum,premio,obs,
+      status:'aberta', // aberta | sorteada | encerrada
+      ganhador:'', numGanhador:'',
+      partic
+    });
+    toast('🎟️ Rifa criada!');
+  }
+  salvRifas();fm('mRifa');renderRifas();
+}
+
+function renderRifas(){
+  const el=document.getElementById('listaRifas');
+  if(!el)return;
+  if(!RIFAS.length){
+    el.innerHTML='<div style="color:var(--sub);text-align:center;padding:24px;font-size:.83rem;">Nenhuma rifa cadastrada.<br><br><button class="btn bv" onclick="novaRifa()">+ Criar primeira rifa</button></div>';
+    return;
+  }
+  el.innerHTML=RIFAS.map((r,i)=>{
+    const arrecad=r.partic.reduce((a,p)=>a+p.numeros*r.valNum,0);
+    const distrib=r.partic.reduce((a,p)=>a+p.numeros,0);
+    const disp=r.totNum-distrib;
+    const corSt=r.status==='sorteada'?'var(--g)':r.status==='encerrada'?'var(--sub)':'var(--ac)';
+    const stLabel=r.status==='sorteada'?'✅ Sorteada':r.status==='encerrada'?'🔒 Encerrada':'🎟️ Aberta';
+    return`<div class="emp-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;">
+        <div style="flex:1;">
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.95rem;">${r.nome}</div>
+          ${r.data?`<div style="font-size:.72rem;color:var(--sub);margin-top:2px;">📅 Sorteio: ${fD(r.data)}</div>`:''}
+        </div>
+        <span class="st" style="color:${corSt};background:${corSt}18;border:1px solid ${corSt}30;font-size:.65rem;flex-shrink:0;">${stLabel}</span>
+      </div>
+      <div class="er2"><span class="el">Total de numeros</span><span class="erv">${r.totNum}</span></div>
+      <div class="er2"><span class="el">Valor por numero</span><span class="erv" style="color:var(--g);">${f(r.valNum)}</span></div>
+      <div class="er2"><span class="el">Premio</span><span class="erv" style="color:var(--am);">${r.premio>0?f(r.premio):'—'}</span></div>
+      <div class="er2"><span class="el">Distribuidos</span><span class="erv">${distrib} / ${r.totNum}</span></div>
+      <div class="er2"><span class="el">Disponiveis</span><span class="erv" style="color:${disp>0?'var(--ac)':'var(--vm)'};">${disp}</span></div>
+      <div class="er2"><span class="el">💰 Arrecadado</span><span class="erv" style="color:var(--g);font-size:.9rem;">${f(arrecad)}</span></div>
+      ${r.obs?`<div class="er2"><span class="el">Obs.</span><span class="erv" style="color:var(--sub);font-size:.72rem;">${r.obs}</span></div>`:''}
+      ${r.status==='sorteada'&&r.ganhador?`<div style="background:rgba(0,200,83,.08);border:1px solid rgba(0,200,83,.2);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.8rem;"><strong style="color:var(--g);">🏆 Ganhador: ${r.ganhador}</strong> — Numero: <strong>${r.numGanhador}</strong></div>`:''}
+
+      <!-- Lista de participantes resumida -->
+      <div style="margin-top:10px;">
+        <div style="font-size:.66rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Participantes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          ${r.partic.map(p=>`<div style="background:${p.numeros>0?'rgba(59,130,246,.12)':'var(--bg2)'};border:1px solid ${p.numeros>0?'rgba(59,130,246,.25)':'var(--bo)'};border-radius:7px;padding:4px 8px;font-size:.72rem;display:flex;align-items:center;gap:5px;">
+            <span style="font-weight:600;">${p.nome.split(' ')[0]}</span>
+            <span style="color:${p.numeros>0?'var(--ac)':'var(--sub)'};">${p.numeros} num.</span>
+            ${p.faixas?`<span style="color:var(--sub);font-size:.65rem;">(${p.faixas})</span>`:''}
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn bv bsm" onclick="abrirNumRifa(${i})">🔢 Numeros</button>
+        <button class="btn bo2 bsm" onclick="editarRifa(${i})">✏️ Editar</button>
+        ${r.status==='aberta'?`<button class="btn bw bsm" onclick="sortearRifa(${i})">🎲 Sortear</button>`:''}
+        ${r.status==='aberta'?`<button class="btn bw bsm" onclick="compartilharRifa(${i})">📲 Compartilhar</button>`:''}
+        <button class="btn bd bsm" onclick="excluirRifa(${i})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirNumRifa(i){
+  rifaNumIdx=i;
+  const r=RIFAS[i];
+  document.getElementById('mRifaNumTit').innerHTML=`🔢 ${r.nome} <button class="xb" onclick="fm('mRifaNum')">✕</button>`;
+  renderNumRifa();
+  am('mRifaNum');
+}
+
+function renderNumRifa(){
+  if(rifaNumIdx===null)return;
+  const r=RIFAS[rifaNumIdx];
+  const distrib=r.partic.reduce((a,p)=>a+p.numeros,0);
+  const disp=r.totNum-distrib;
+  document.getElementById('rnDistrib').textContent=distrib;
+  document.getElementById('rnTotal').textContent=r.totNum;
+  document.getElementById('rnDisp').textContent=disp;
+  document.getElementById('rnDisp').style.color=disp<0?'var(--vm)':disp===0?'var(--g)':'var(--am)';
+
+  document.getElementById('rifaNumLista').innerHTML=r.partic.map((p,pi)=>`
+    <div style="background:var(--card2);border:1px solid var(--bo);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-weight:700;font-size:.84rem;margin-bottom:7px;">${p.nome}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <div>
+          <label style="font-size:.67rem;color:var(--sub);display:block;margin-bottom:2px;">Qtd. de numeros</label>
+          <input type="number" min="0" value="${p.numeros}" style="width:80px;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:.86rem;outline:none;font-family:inherit;"
+            oninput="RIFAS[${rifaNumIdx}].partic[${pi}].numeros=parseInt(this.value)||0;renderNumRifa();">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:.67rem;color:var(--sub);display:block;margin-bottom:2px;">Faixas de numeros (ex: 01-10, 45)</label>
+          <input type="text" value="${p.faixas||''}" placeholder="ex: 01-10, 45, 67" style="width:100%;background:var(--bg2);border:1px solid var(--bo);border-radius:7px;padding:6px 8px;color:var(--tx);font-size:.82rem;outline:none;font-family:inherit;"
+            oninput="RIFAS[${rifaNumIdx}].partic[${pi}].faixas=this.value;">
+        </div>
+      </div>
+      ${p.numeros>0&&r.valNum>0?`<div style="font-size:.72rem;color:var(--g);margin-top:5px;">💰 ${p.numeros} × ${f(r.valNum)} = ${f(p.numeros*r.valNum)}</div>`:''}
+    </div>`).join('');
+}
+
+function salvarNumRifa(){
+  salvRifas();
+  fm('mRifaNum');
+  renderRifas();
+  toast('💾 Numeros salvos!');
+}
+
+function editarRifa(i){
+  rifaEditIdx=i;
+  const r=RIFAS[i];
+  document.getElementById('mRifaTit').innerHTML='✏️ Editar Rifa <button class="xb" onclick="fm(\'mRifa\')">✕</button>';
+  document.getElementById('rifaNome').value=r.nome;
+  document.getElementById('rifaData').value=r.data||'';
+  document.getElementById('rifaValNum').value=r.valNum>0?r.valNum.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
+  document.getElementById('rifaTotalNum').value=r.totNum;
+  document.getElementById('rifaPremio').value=r.premio>0?r.premio.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
+  document.getElementById('rifaObs').value=r.obs||'';
+  calcRifa();
+  am('mRifa');
+}
+
+function sortearRifa(i){
+  const r=RIFAS[i];
+  const ganhador=prompt('Nome do ganhador:');
+  if(!ganhador)return;
+  const num=prompt('Numero sorteado:');
+  r.ganhador=ganhador;
+  r.numGanhador=num||'';
+  r.status='sorteada';
+  salvRifas();renderRifas();
+  toast('🏆 '+ganhador+' ganhou com o numero '+num+'!');
+}
+
+function compartilharRifa(i){
+  const r=RIFAS[i];
+  const distrib=r.partic.reduce((a,p)=>a+p.numeros,0);
+  const arrecad=r.partic.reduce((a,p)=>a+p.numeros*r.valNum,0);
+  let txt=`🎟️ *${r.nome}*\n`;
+  if(r.data)txt+=`📅 Sorteio: ${fD(r.data)}\n`;
+  txt+=`💰 Valor por numero: ${f(r.valNum)}\n`;
+  if(r.premio>0)txt+=`🏆 Premio: ${f(r.premio)}\n`;
+  txt+=`\n*Numeros por participante:*\n${'─'.repeat(24)}\n`;
+  r.partic.filter(p=>p.numeros>0).forEach(p=>{
+    txt+=`${p.nome}: ${p.numeros} numero${p.numeros>1?'s':''}${p.faixas?' ('+p.faixas+')':''}  →  ${f(p.numeros*r.valNum)}\n`;
+  });
+  txt+=`${'─'.repeat(24)}\n`;
+  txt+=`Total distribuido: ${distrib} numeros\n`;
+  txt+=`💰 *Arrecadado: ${f(arrecad)}*`;
+  if(r.obs)txt+=`\n\n📝 ${r.obs}`;
+  abrirLink('https://wa.me/?text='+encodeURIComponent(txt));
+}
+
+function excluirRifa(i){
+  cnf('Excluir rifa?',RIFAS[i].nome+' — esta acao nao pode ser desfeita.',()=>{
+    RIFAS.splice(i,1);salvRifas();renderRifas();toast('🗑 Rifa excluida.');
   });
 }
 
