@@ -827,26 +827,27 @@ function load(){
     const p=localStorage.getItem('gc_ps');
     const e=localStorage.getItem('gc_em');
     if(p){
+      // Substitui PS completamente pelo que está salvo
+      // Garante campos obrigatórios em cada participante
       const arr=JSON.parse(p);
-      arr.forEach((src,i)=>{
-        if(PS[i]){
-          PS[i].tel=src.tel||'';
-          PS[i].hist=src.hist||A12();
-          PS[i].datas=src.datas||A12n();
-        }
-      });
+      PS=arr.map(src=>({
+        id:    src.id   || Date.now()+Math.random(),
+        nome:  src.nome || '—',
+        cotas: src.cotas|| 1,
+        tel:   src.tel  || '',
+        hist:  src.hist && src.hist.length===12 ? src.hist : new Array(12).fill(false),
+        datas: src.datas&& src.datas.length===12? src.datas: new Array(12).fill(null),
+      }));
     }
     if(e){
       EMPS=JSON.parse(e);
-      // Migrar emprestimos antigos (sem ciclos) para o novo formato
       EMPS.forEach(x=>{
         if(!x.pagamentos)x.pagamentos=[];
         if(x.saldoDevedor===undefined)x.saldoDevedor=x.valor;
-        if(!x.taxa)x.taxa=20; // taxa padrao se nao tinha
+        if(!x.taxa)x.taxa=20;
         if(!x.ciclos||x.ciclos.length===0){
-          // Migrar: criar ciclos a partir da data de vencimento antiga
           const venc=x.venc||x.dataEmprestimo||new Date().toISOString().split('T')[0];
-          x.ciclos=[{venc, juros:calcJTaxa(x.saldoDevedor,x.taxa), pago:false, dataPgto:null, valorPago:0}];
+          x.ciclos=[{venc,juros:calcJTaxa(x.saldoDevedor,x.taxa),pago:false,dataPgto:null,valorPago:0}];
         }
         if(!x.dataEmprestimo)x.dataEmprestimo=x.dataCriacao||'';
       });
